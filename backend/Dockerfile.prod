@@ -1,0 +1,27 @@
+FROM node:18-alpine
+
+# Dependências do Chromium para whatsapp-web.js
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    udev
+
+ENV PUPPETEER_SKIP_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY . .
+
+RUN mkdir -p logs uploads whatsapp-sessions
+
+EXPOSE 3001
+
+CMD ["npm", "start"]

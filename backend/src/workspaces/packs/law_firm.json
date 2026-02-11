@@ -1,0 +1,28 @@
+{
+  "name": "Escritório de Advocacia",
+  "key": "law_firm",
+  "description": "Pacote para escritórios de advocacia",
+  "version": "1.0.0",
+  "config": {
+    "whatsapp": {
+      "welcome_message": true,
+      "business_hours": true
+    },
+    "catalogo": {
+      "enabled": false
+    },
+    "fluxos": ["triagem", "agendamento", "acompanhamento"]
+  },
+  "textos_cms": [
+    {
+      "chave": "menu.principal.titulo",
+      "conteudo": "⚖️ *Bem-vindo ao nosso Escritório de Advocacia* ⚖️",
+      "ativo": true
+    },
+    {
+      "chave": "menu.principal.opcoes",
+      "conteudo": "Como podemos ajudar?\n\n1️⃣ *Triagem Jurídica* - Avaliação inicial do caso\n2️⃣ *Agendamento de Consulta*\n3️⃣ *Acompanhamento de Processo*\n4️⃣ *Falar com Advogado*\n\nDigite o número da opção desejada.",
+      "ativo": true
+    }
+  ]
+}

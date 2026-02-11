@@ -1,0 +1,167 @@
+{
+  "name": "Loja de iPhones",
+  "key": "iphone_store",
+  "description": "Pacote para lojas de iPhones e smartphones",
+  "version": "1.0.0",
+  "config": {
+    "whatsapp": {
+      "welcome_message": true,
+      "business_hours": true
+    },
+    "catalogo": {
+      "enabled": true,
+      "type": "produtos"
+    },
+    "fluxos": ["venda", "assistencia_tecnica", "pos_venda"]
+  },
+  "textos_cms": [
+    {
+      "chave": "menu.principal.titulo",
+      "conteudo": "🤖 *Bem-vindo à nossa loja de iPhones* 🤖",
+      "ativo": true
+    },
+    {
+      "chave": "menu.principal.opcoes",
+      "conteudo": "Escolha uma opção:\n\n1️⃣ *Catálogo* - Ver modelos de iPhone\n2️⃣ *Acessórios* - Capas, carregadores e mais\n3️⃣ *Assistência Técnica* - Conserto e reparos\n4️⃣ *Serviços* - Manutenção preventiva\n5️⃣ *Pós-venda e Garantia*\n6️⃣ *Falar com Atendente*\n\nDigite o número da opção desejada.",
+      "ativo": true
+    },
+    {
+      "chave": "catalogo.menu.titulo",
+      "conteudo": "📱 *Catálogo de iPhones*",
+      "ativo": true
+    },
+    {
+      "chave": "catalogo.menu.opcoes",
+      "conteudo": "Escolha uma categoria:\n\n1. iPhone 15 (Novo)\n2. iPhone 14 (Semi-novo)\n3. iPhone 13 (Excelente estado)\n4. Outros modelos\n5. Voltar\n\nDigite o número da opção desejada.",
+      "ativo": true
+    }
+  ],
+  "fluxos": {
+    "venda": {
+      "nome": "Fluxo de Venda",
+      "descricao": "Processo de venda de iPhones",
+      "estados": [
+        "CATALOGO_MENU",
+        "CATALOGO_LISTA_MODELOS",
+        "CATALOGO_DETALHE_MODELO",
+        "SIMULACAO_PARCELAMENTO",
+        "COLETA_DADOS_MINIMOS_VENDA",
+        "GERAR_DOSSIE_VENDA",
+        "AVALIAR_ESCALONAMENTO"
+      ],
+      "coleta_dados": [
+        {
+          "campo": "modelo",
+          "pergunta": "Qual modelo você tem interesse?",
+          "obrigatorio": true,
+          "tipo": "texto"
+        },
+        {
+          "campo": "capacidade",
+          "pergunta": "Qual capacidade de armazenamento?",
+          "obrigatorio": true,
+          "tipo": "opcoes",
+          "opcoes": ["64GB", "128GB", "256GB", "512GB", "1TB"]
+        },
+        {
+          "campo": "cidade",
+          "pergunta": "Em qual cidade você está?",
+          "obrigatorio": true,
+          "tipo": "texto"
+        },
+        {
+          "campo": "pagamento",
+          "pergunta": "Qual forma de pagamento prefere?",
+          "obrigatorio": true,
+          "tipo": "opcoes",
+          "opcoes": ["PIX", "Cartão de crédito", "Boleto", "Dinheiro"]
+        }
+      ]
+    },
+    "assistencia_tecnica": {
+      "nome": "Assistência Técnica",
+      "descricao": "Triagem para conserto de iPhones",
+      "estados": [
+        "TECNICO_MENU",
+        "TECNICO_TRIAGEM",
+        "TECNICO_COLETA_DETALHES",
+        "GERAR_DOSSIE_TECNICO",
+        "AVALIAR_ESCALONAMENTO"
+      ],
+      "coleta_dados": [
+        {
+          "campo": "modelo",
+          "pergunta": "Qual o modelo do seu iPhone?",
+          "obrigatorio": true,
+          "tipo": "texto"
+        },
+        {
+          "campo": "defeito",
+          "pergunta": "Qual o defeito apresentado?",
+          "obrigatorio": true,
+          "tipo": "texto"
+        },
+        {
+          "campo": "queda",
+          "pergunta": "O aparelho sofreu queda recentemente?",
+          "obrigatorio": false,
+          "tipo": "boolean"
+        },
+        {
+          "campo": "liquido",
+          "pergunta": "Teve contato com líquido?",
+          "obrigatorio": false,
+          "tipo": "boolean"
+        }
+      ]
+    }
+  },
+  "regras_escalonamento": [
+    {
+      "condicao": "intencao == 'HUMANO_SOLICITADO'",
+      "acao": "escalonar_imediato",
+      "prioridade": "alta"
+    },
+    {
+      "condicao": "dossie_completude >= 0.8",
+      "acao": "escalonar",
+      "prioridade": "media"
+    },
+    {
+      "condicao": "tempo_estado > 300",
+      "acao": "escalonar",
+      "prioridade": "baixa"
+    }
+  ],
+  "template_dossie": {
+    "ordenacao": [
+      "cliente",
+      "intencaoDetectada",
+      "dadosColetados",
+      "prioridade",
+      "sugestaoAbordagem"
+    ],
+    "campos": {
+      "cliente": ["telefone", "nome", "cidade"],
+      "dadosColetados": ["modelo", "capacidade", "pagamento", "urgencia"]
+    }
+  },
+  "regras_extracao": {
+    "venda": {
+      "cidade": "(?:mor[ao]|sou de|em)\\s+([A-Za-zÀ-ÿ\\s]+)",
+      "pagamento": "(?:pagamento|forma.*pagamento|pagar)\\s+(pix|cartão|cartao|boleto|dinheiro)",
+      "urgencia": "(?:urgente|urgência|rapido|rápido|hoje|amanhã)"
+    },
+    "tecnico": {
+      "modelo": "(?:iphone|modelo)\\s+(\\d+)",
+      "defeito": "(?:nao.*liga|tela.*quebrada|bateria|não.*carrega|sem.*sinal)",
+      "queda": "(?:caiu|queda|derrubou)",
+      "liquido": "(?:água|agua|liquido|molhou)"
+    },
+    "posVenda": {
+      "pedido": "(?:pedido|OS|ordem)\\s+([A-Z0-9-]+)",
+      "problema": "(?:problema|defeito|reclamação)\\s+(.+)",
+      "garantia": "(?:garantia|garantido)"
+    }
+  }
+}

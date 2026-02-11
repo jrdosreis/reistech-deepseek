@@ -1,0 +1,732 @@
+openapi: 3.0.0
+info:
+  title: ReisTech Platform API
+  version: 2.0.0
+  description: API completa para o sistema de automação de atendimento ReisTech
+  contact:
+    name: Suporte Técnico ReisTech
+    email: contato@reiscelulares.com.br
+    url: https://docs.reiscelulares.com.br
+
+servers:
+  - url: https://api.reiscelulares.com.br/v1
+    description: Servidor de produção
+  - url: http://localhost:3001/api
+    description: Servidor de desenvolvimento
+
+tags:
+  - name: Autenticação
+    description: Operações de login, logout e gerenciamento de tokens
+  - name: Usuários
+    description: Gerenciamento de usuários e permissões
+  - name: WhatsApp
+    description: Integração com WhatsApp e gestão de conversas
+  - name: Fila Humana
+    description: Sistema de fila para atendimento humano
+  - name: Clientes
+    description: Gerenciamento de clientes e estados
+  - name: CMS
+    description: Sistema de textos e respostas padronizadas
+  - name: Catálogo
+    description: Produtos e serviços por nicho
+  - name: Relatórios
+    description: Analytics e métricas do sistema
+  - name: Workspace
+    description: Configuração multi-tenant
+
+paths:
+  # ============ AUTENTICAÇÃO ============
+  /auth/login:
+    post:
+      tags: [Autenticação]
+      summary: Login de usuário
+      description: Autentica um usuário e retorna tokens JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: admin@empresa.com
+                password:
+                  type: string
+                  format: password
+                  example: "SenhaSegura123"
+      responses:
+        '200':
+          description: Login bem-sucedido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: Token JWT para autenticação (expira em 15min)
+                  refreshToken:
+                    type: string
+                    description: Token para renovação (expira em 7 dias)
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Credenciais inválidas
+        '423':
+          description: Usuário bloqueado
+
+  /auth/refresh:
+    post:
+      tags: [Autenticação]
+      summary: Renovar token de acesso
+      description: Usa o refresh token para obter novo access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Token renovado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                  refreshToken:
+                    type: string
+        '401':
+          description: Refresh token inválido ou expirado
+
+  /auth/logout:
+    post:
+      tags: [Autenticação]
+      summary: Logout do usuário
+      description: Invalida o refresh token atual
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logout realizado com sucesso
+        '401':
+          description: Não autenticado
+
+  # ============ WHATSAPP ============
+  /whatsapp/status:
+    get:
+      tags: [WhatsApp]
+      summary: Status da conexão WhatsApp
+      description: Retorna o status atual da conexão com WhatsApp
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Status retornado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  connected:
+                    type: boolean
+                  qrCode:
+                    type: string
+                    description: Base64 QR Code (se desconectado)
+                  phoneNumber:
+                    type: string
+                  lastConnection:
+                    type: string
+                    format: date-time
+
+  /whatsapp/send:
+    post:
+      tags: [WhatsApp]
+      summary: Enviar mensagem via WhatsApp
+      description: Envia mensagem para um cliente específico
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [clienteId, mensagem]
+              properties:
+                clienteId:
+                  type: integer
+                mensagem:
+                  type: string
+                anexo:
+                  type: object
+                  properties:
+                    tipo:
+                      type: string
+                      enum: [imagem, documento, audio, video]
+                    url:
+                      type: string
+                    nome:
+                      type: string
+      responses:
+        '200':
+          description: Mensagem enviada com sucesso
+        '400':
+          description: Cliente não encontrado ou parâmetros inválidos
+
+  /whatsapp/conversas:
+    get:
+      tags: [WhatsApp]
+      summary: Listar conversas ativas
+      description: Retorna lista de conversas ordenadas por última mensagem
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: filter
+          in: query
+          schema:
+            type: string
+            enum: [todas, nao_lidas, atribuidas, nao_atribuidas]
+      responses:
+        '200':
+          description: Lista de conversas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Conversa'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /whatsapp/conversas/{clienteId}/mensagens:
+    get:
+      tags: [WhatsApp]
+      summary: Obter mensagens da conversa
+      description: Retorna histórico de mensagens com um cliente
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: clienteId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Histórico de mensagens
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Mensagem'
+
+  # ============ FILA HUMANA ============
+  /fila:
+    get:
+      tags: [Fila Humana]
+      summary: Listar clientes na fila
+      description: Retorna clientes aguardando atendimento humano
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: estado
+          in: query
+          schema:
+            type: string
+            enum: [esperando, em_atendimento, todos]
+            default: esperando
+      responses:
+        '200':
+          description: Lista de clientes na fila
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FilaItem'
+
+  /fila/{clienteId}/assumir:
+    post:
+      tags: [Fila Humana]
+      summary: Assumir cliente da fila
+      description: Operador assume atendimento de um cliente da fila
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: clienteId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Cliente assumido com sucesso
+        '409':
+          description: Cliente já está sendo atendido
+        '404':
+          description: Cliente não encontrado na fila
+
+  /fila/{clienteId}/liberar:
+    post:
+      tags: [Fila Humana]
+      summary: Liberar cliente da fila
+      description: Operador libera cliente (finaliza atendimento)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: clienteId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Cliente liberado com sucesso
+        '403':
+          description: Operador não está atendendo este cliente
+        '404':
+          description: Cliente não encontrado
+
+  # ============ CMS ============
+  /cms/textos:
+    get:
+      tags: [CMS]
+      summary: Listar textos CMS
+      description: Retorna textos padronizados do workspace
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: categoria
+          in: query
+          schema:
+            type: string
+        - name: nicho
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de textos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TextoCMS'
+
+    post:
+      tags: [CMS]
+      summary: Criar novo texto CMS
+      description: Adiciona novo texto padronizado
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TextoCMSCreate'
+      responses:
+        '201':
+          description: Texto criado com sucesso
+        '409':
+          description: Chave já existe
+
+  /cms/textos/{id}:
+    put:
+      tags: [CMS]
+      summary: Atualizar texto CMS
+      description: Atualiza texto existente
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TextoCMSUpdate'
+      responses:
+        '200':
+          description: Texto atualizado com sucesso
+        '404':
+          description: Texto não encontrado
+
+    delete:
+      tags: [CMS]
+      summary: Excluir texto CMS
+      description: Remove texto do sistema
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Texto excluído com sucesso
+        '404':
+          description: Texto não encontrado
+
+  # ============ CATÁLOGO ============
+  /catalogo:
+    get:
+      tags: [Catálogo]
+      summary: Listar itens do catálogo
+      description: Retorna produtos/serviços do workspace
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: categoria
+          in: query
+          schema:
+            type: string
+        - name: disponivel
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Lista de itens
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CatalogoItem'
+
+    post:
+      tags: [Catálogo]
+      summary: Adicionar item ao catálogo
+      description: Cria novo produto/serviço
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CatalogoItemCreate'
+      responses:
+        '201':
+          description: Item criado com sucesso
+
+  /catalogo/{id}:
+    put:
+      tags: [Catálogo]
+      summary: Atualizar item do catálogo
+      description: Atualiza informações do item
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CatalogoItemUpdate'
+      responses:
+        '200':
+          description: Item atualizado com sucesso
+
+    delete:
+      tags: [Catálogo]
+      summary: Remover item do catálogo
+      description: Exclui item (soft delete)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Item removido com sucesso
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [admin, operador]
+        workspace_id:
+          type: integer
+        active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    Conversa:
+      type: object
+      properties:
+        cliente_id:
+          type: integer
+        cliente_nome:
+          type: string
+        cliente_telefone:
+          type: string
+        ultima_mensagem:
+          type: string
+        ultima_mensagem_at:
+          type: string
+          format: date-time
+        nao_lidas:
+          type: integer
+        operador_id:
+          type: integer
+          nullable: true
+        operador_nome:
+          type: string
+          nullable: true
+        estado:
+          type: string
+          enum: [ativo, inativo, arquivado]
+
+    Mensagem:
+      type: object
+      properties:
+        id:
+          type: integer
+        texto:
+          type: string
+        direcao:
+          type: string
+          enum: [recebida, enviada]
+        status:
+          type: string
+          enum: [enviando, enviada, entregue, lida, erro]
+        created_at:
+          type: string
+          format: date-time
+        user_id:
+          type: integer
+          nullable: true
+        anexo:
+          type: object
+          nullable: true
+
+    FilaItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        cliente_id:
+          type: integer
+        cliente_nome:
+          type: string
+        cliente_telefone:
+          type: string
+        estado:
+          type: string
+          enum: [esperando, em_atendimento]
+        prioridade:
+          type: integer
+        tempo_espera:
+          type: integer
+          description: Tempo em minutos
+        operador_id:
+          type: integer
+          nullable: true
+        operador_nome:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    TextoCMS:
+      type: object
+      properties:
+        id:
+          type: integer
+        chave:
+          type: string
+        valor:
+          type: string
+        categoria:
+          type: string
+        nicho:
+          type: string
+        workspace_id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    TextoCMSCreate:
+      type: object
+      required: [chave, valor]
+      properties:
+        chave:
+          type: string
+        valor:
+          type: string
+        categoria:
+          type: string
+        nicho:
+          type: string
+
+    TextoCMSUpdate:
+      type: object
+      properties:
+        valor:
+          type: string
+        categoria:
+          type: string
+        nicho:
+          type: string
+
+    CatalogoItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        descricao:
+          type: string
+          nullable: true
+        preco:
+          type: number
+          format: float
+        categoria:
+          type: string
+        disponivel:
+          type: boolean
+        imagem_url:
+          type: string
+          nullable: true
+        workspace_id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CatalogoItemCreate:
+      type: object
+      required: [nome, preco]
+      properties:
+        nome:
+          type: string
+        descricao:
+          type: string
+        preco:
+          type: number
+          format: float
+        categoria:
+          type: string
+        disponivel:
+          type: boolean
+          default: true
+        imagem_url:
+          type: string
+
+    CatalogoItemUpdate:
+      type: object
+      properties:
+        nome:
+          type: string
+        descricao:
+          type: string
+        preco:
+          type: number
+          format: float
+        categoria:
+          type: string
+        disponivel:
+          type: boolean
+        imagem_url:
+          type: string
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        pages:
+          type: integer

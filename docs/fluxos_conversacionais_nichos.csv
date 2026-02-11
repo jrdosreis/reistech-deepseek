@@ -1,0 +1,36 @@
+NICHO,ESTADO_INICIAL,GATILHO,RESPOSTA_AUTO,PROXIMO_ESTADO,ACAO_HUMANA_REQUERIDA
+iPhone Store,inicio,saudacao,"Olá! Bem-vindo à [Nome Loja]. Em que posso ajudá-lo hoje?",consulta,false
+iPhone Store,consulta,"preço, valor, custo","Temos iPhones de R$ 2.500 a R$ 12.000. De qual modelo gostaria de saber?",modelo_selecao,false
+iPhone Store,modelo_selecao,"13, 14, 15, SE","O iPhone {modelo} está por R$ {preco}. Posso mostrar as cores disponíveis?",cores_disponiveis,false
+iPhone Store,cores_disponiveis,"preto, branco, azul, rosa","Excelente escolha! O {modelo} {cor} está disponível para retirada imediata. Posso reservar para você?",reserva,false
+iPhone Store,reserva,"sim, quero, reservar","Perfeito! Para finalizar a reserva, preciso do seu nome completo e CPF.",coleta_dados,false
+iPhone Store,coleta_dados,"(nome e cpf fornecidos)","Reserva confirmada! Aguardamos sua retirada em até 48h. Posso ajudá-lo em mais alguma coisa?",finalizado,true
+iPhone Store,reserva,"não, talvez depois","Sem problemas! Ficaremos à disposição quando quiser. Deseja que envie o orçamento por WhatsApp?",followup,true
+
+Advocacia,inicio,saudacao,"Olá! Bem-vindo ao escritório [Nome]. Em qual área do direito precisa de assistência?",triagem_area,false
+Advocacia,triagem_area,"trabalhista, cível, família, penal","Entendido. Para melhor assessorá-lo, conte-me brevemente sobre seu caso.",coleta_detalhes,false
+Advocacia,coleta_detalhes,"(descrição do caso)","Agradeço as informações. Um de nossos advogados especializados analisará seu caso. Posso agendar uma consulta inicial?",agendamento,false
+Advocacia,agendamento,"sim, agendar","Ótimo! Temos horários nesta [dia]. Qual período prefere: manhã ou tarde?",confirmacao_horario,false
+Advocacia,confirmacao_horario,"manhã, tarde, 9h, 14h","Perfeito! Confirmado para [data] às [hora]. Enviaremos os detalhes por email. Precisa de mais alguma informação?",finalizado,true
+Advocacia,agendamento,"ainda não, pensar","Sem problemas! Ficaremos à disposição. Deseja receber nosso material informativo sobre direitos na área {area}?",followup,true
+
+Mecânica,inicio,saudacao,"Olá! Bem-vindo à [Nome Oficina]. Qual serviço precisa hoje?",diagnostico_servico,false
+Mecânica,diagnostico_servico,"revisão, troca óleo, freio, motor","Certo. Para {servico}, posso passar um orçamento preliminar. Qual modelo e ano do veículo?",coleta_veiculo,false
+Mecânica,coleta_veiculo,"(modelo, ano)","Para {veiculo}, o {servico} fica em torno de R$ {valor}. Deseja agendar uma avaliação detalhada?",agendamento_avaliacao,false
+Mecânica,agendamento_avaliacao,"sim, agendar","Temos horários para avaliação em [dias]. Prefere qual período?",confirmacao_periodo,false
+Mecânica,confirmacao_periodo,"manhã, tarde, específico","Agendado! Nos encontraremos [data] no período [periodo]. Traga documento do veículo.",finalizado,true
+Mecânica,agendamento_avaliacao,"preciso pensar","Entendido! Guardaremos seu orçamento por 7 dias. Posso enviar lembrete?",followup,true
+
+Nail Designer,inicio,saudacao,"Oi! Bem-vinda ao [Nome Estúdio]. Gostaria de ver nossos designs ou já sabe o que quer?",apresentacao,false
+Nail Designer,apresentacao,"ver, mostrar, designs","Claro! Aqui estão nossos últimos trabalhos: [link fotos]. Algum te chamou atenção?",selecao_design,false
+Nail Designer,selecao_design,"(design escolhido)","Linda escolha! Para o design {design}, preciso de aproximadamente {tempo}. Tem preferência de data?",agendamento_data,false
+Nail Designer,agendamento_data,"(data sugerida)","{data} disponível! Temos horários às {horarios}. Qual prefere?",confirmacao_horario,false
+Nail Designer,confirmacao_horario,"(horário)","Perfeito! Reservado para {data} às {hora}. Chegar 10min antes, por favor. Confirmo 1 dia antes.",finalizado,true
+Nail Designer,agendamento_data,"vou verificar","Sem pressa! Ficaremos à disposição. Deseja que envie portfólio completo?",followup,true
+
+Detetive,inicio,saudacao,"Boa noite. Serviços de investigação particular. Como posso ajudá-lo?",confidencialidade_check,false
+Detetive,confidencialidade_check,"preciso de ajuda, investigar","Entendo. Nossos serviços são 100% confidenciais. Pode descrever brevemente a situação?",coleta_contexto,false
+Detetive,coleta_contexto,"(contexto geral)","Agradeço a confiança. Para casos de {tipo}, nosso protocolo envolve {etapas}. Posso agendar conversa segura?",agendamento_sigiloso,false
+Detetive,agendamento_sigiloso,"sim, seguro","Excelente. Oferecemos reunião via [app seguro] ou local discreto. Qual prefere?",definicao_meio,false
+Detetive,definicao_meio,"(escolha meio)","Confirmado. Enviaremos instruções para {meio} em até 2h. Aguarde nosso contato.",finalizado,true
+Detetive,agendamento_sigiloso,"preciso pensar","Compreendo a sensibilidade. Nossos canais permanecem abertos. Segurança garantida.",followup,true

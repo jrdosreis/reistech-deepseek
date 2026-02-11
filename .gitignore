@@ -1,0 +1,34 @@
+.env
+.env.local
+.env.prod
+.env.production
+logs/
+node_modules/
+
+# Backups
+*.backup-*
+*.bak
+*.old
+
+# Build outputs
+dist/
+build/
+coverage/
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+cypress/videos/
+cypress/screenshots/
+
+# WhatsApp sessions (opcional - comente se quiser versioná-las)
+# backend/whatsapp-sessions/

@@ -1,0 +1,29 @@
+{
+  "name": "Mecânica de Motos",
+  "key": "motorcycle_shop",
+  "description": "Pacote para mecânicas de motos",
+  "version": "1.0.0",
+  "config": {
+    "whatsapp": {
+      "welcome_message": true,
+      "business_hours": true
+    },
+    "catalogo": {
+      "enabled": true,
+      "type": "pecas"
+    },
+    "fluxos": ["orcamento", "agendamento", "duvidas_tecnicas"]
+  },
+  "textos_cms": [
+    {
+      "chave": "menu.principal.titulo",
+      "conteudo": "🏍️ *Bem-vindo à nossa Mecânica de Motos* 🏍️",
+      "ativo": true
+    },
+    {
+      "chave": "menu.principal.opcoes",
+      "conteudo": "Escolha uma opção:\n\n1️⃣ *Orçamento de Reparo*\n2️⃣ *Agendamento de Serviço*\n3️⃣ *Peças e Acessórios*\n4️⃣ *Dúvidas Técnicas*\n5️⃣ *Falar com Mecânico*\n\nDigite o número da opção desejada.",
+      "ativo": true
+    }
+  ]
+}
