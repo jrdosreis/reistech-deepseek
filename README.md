@@ -76,59 +76,171 @@ O projeto recebeu atualizações estruturais focadas em segurança, performance 
 - Redis (opcional)
 - Docker e Docker Compose (opcional)
 
-## Testes Automatizados
+## 🧪 Testes Automatizados
 
-Para garantir a estabilidade das novas funcionalidades, execute a suíte de testes:
-
-# Rodar todos os testes
-cd backend
-npm test
-
-# Gerar relatório de cobertura de código
-npm run test:coverage
-
-## Setup local (macOS)
-
-# Dependências base
-brew install postgresql@15
-brew services start postgresql@15
-createdb reistech
-
-# Redis (opcional)
-brew install redis
-brew services start redis
-
+```bash
 # Backend
 cd backend
+
+# Rodar todos os testes
+npm test
+
+# Testes com cobertura
+npm run test:coverage
+
+# Testes em watch mode
+npm run test:watch
+
+# Frontend
+cd frontend
+
+# Testes Jest
+npm test
+
+# Testes E2E (Cypress)
+npm run test:e2e
+```
+
+## 📊 Banco de Dados
+
+### Migrations
+
+```bash
+cd backend
+
+# Executar migrations
+npm run migrate up
+
+# Reverter última migration
+npm run migrate down
+
+# Criar nova migration
+npm run migrate:create nome_da_migration
+```
+
+### Seeds
+
+```bash
+cd backend
+
+# Popular banco com dados iniciais (idempotente)
+npm run seed
+
+# Reset completo (down → up → seed)
+npm run db:reset
+```
+
+## 🛠️ Scripts Úteis
+
+```bash
+# Deploy para produção
+./scripts/deploy-production.sh
+
+# Backup completo do projeto
+./scripts/backup-projeto.sh
+
+# Verificar estrutura e configurações
+./scripts/verificar-tudo.sh
+
+# Limpeza de arquivos temporários
+./scripts/limpar-macbook.sh
+
+# Auditoria de segurança
+./scripts/auditoria-macbook.sh
+```
+
+## 📋 Documentação Completa
+
+- **[Setup Local](docs/SETUP_LOCAL.md)** - Guia detalhado para ambiente de desenvolvimento
+- **[Manual Oficial](MANUAL-OFICIAL.html)** - Setup completo Windows + MacBook (desenvolvimento remoto)
+- **[Estrutura do Projeto](docs/ESTRUTURA.md)** - Organização de pastas e arquivos
+- **[Guia de Migração](docs/MIGRATION_GUIDE.md)** - Atualizações e migrações de versão
+- **[Otimização para Produção](docs/OTIMIZACAO_PRODUCAO.md)** - Deploy e configurações de produção
+- **[Especificação Técnica](docs/reistech_especificacao_tecnica.md)** - Detalhes técnicos completos
+
+## 🚀 Quick Start
+
+### Requisitos
+
+- Node.js 18+
+- PostgreSQL 15+
+- Redis 7+ (opcional, mas recomendado)
+- Docker e Docker Compose (opcional)
+
+### Setup Local (macOS)
+
+```bash
+# 1. Clonar repositório
+git clone https://github.com/jrdosreis/reistech-deepseek.git
+cd reistech-deepseek
+
+# 2. Dependências do sistema
+brew install postgresql@15 redis
+brew services start postgresql@15
+brew services start redis
+
+# 3. Criar banco de dados
+psql postgres -c "CREATE USER reistechuser WITH PASSWORD 'reistechpass';"
+psql postgres -c "CREATE DATABASE reistechdb OWNER reistechuser;"
+
+# 4. Configurar variáveis de ambiente
 cp .env.example .env
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+# Edite os arquivos .env com suas credenciais
+
+# 5. Backend
+cd backend
 npm install
 npm run migrate up
 npm run seed
-npm run dev
+npm run dev  # Roda na porta 3000
 
-# Frontend (novo terminal)
-cd ../frontend
-# Crie um .env local se necessário com VITE_API_URL e VITE_WS_URL
+# 6. Frontend (novo terminal)
+cd frontend
 npm install
-npm run dev
+npm run dev  # Roda na porta 5173
+```
 
+### Setup com Docker (Desenvolvimento)
 
-## Setup com Docker Compose
-
-bash
+```bash
+# Subir containers
 docker-compose up -d
+
+# Executar migrations e seeds
 docker-compose exec backend npm run migrate up
 docker-compose exec backend npm run seed
 
+# Ver logs
+docker-compose logs -f
+```
 
-## URLs padrão
+### Setup com Docker (Produção)
 
-- Frontend: http://localhost (porta 80)
-- Backend: http://localhost:3000
+```bash
+# Usar configuração de produção
+docker-compose -f docker-compose.prod.yml up -d
 
-Credenciais padrão:
-- Email: contato@reiscelulares.com.br
-- Senha: admin@reiscelulares
+# Executar migrations
+docker-compose -f docker-compose.prod.yml exec backend npm run migrate up
+```
+
+## 🌐 URLs e Credenciais
+
+### Desenvolvimento Local
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:3000/api
+- **WebSocket**: ws://localhost:3000/ws
+
+### Desenvolvimento Docker (Remoto)
+- **Frontend**: http://192.168.100.232 (porta 80)
+- **Backend API**: http://192.168.100.232:3000/api
+- **WebSocket**: ws://192.168.100.232:3000/ws
+
+### Credenciais Padrão
+- **Email**: contato@reiscelulares.com.br
+- **Senha**: admin@reiscelulares
 
 ## Principais endpoints
 
@@ -165,49 +277,151 @@ Credenciais padrão:
 - DELETE /api/workspaces/:id - Deletar workspace
 - POST /api/workspaces/:workspaceId/reload-rules - Recarregar regras FSM
 
-## Estrutura resumida
+## 📁 Estrutura do Projeto
 
 ```
 .
-├── .env /.env.prod /.env.prod.template
+├── .env                        # Variáveis de ambiente (Docker Compose)
+├── MANUAL-OFICIAL.html         # Manual completo de setup
+├── README.md                   # Este arquivo
+├── docker-compose.yml          # Desenvolvimento
+├── docker-compose.prod.yml     # Produção
+│
+├── .github/                    # GitHub Actions e templates
+│   ├── copilot-instructions.md # Instruções para AI agents
+│   ├── workflows/              # CI/CD pipelines
+│   ├── ISSUE_TEMPLATE/         # Templates de issues
+│   └── PULL_REQUEST_TEMPLATE.md
+│
 ├── backend/
+│   ├── .env                    # Variáveis backend (local)
+│   ├── app.js                  # Express app
+│   ├── server.js               # HTTP + WebSocket server
+│   ├── Dockerfile.prod         # Container produção
+│   ├── ecosystem.config.js     # PM2 cluster config
+│   │
 │   ├── src/
-│   │   ├── config/ (database, env, logger, theme)
-│   │   ├── core/ (engine FSM, errors, middleware shared, utils)
-│   │   ├── db/ (migrations, models, seeds)
-│   │   ├── modules/ (admin, auth, catalogo, cms, fila, conversas, whatsapp, etc.)
-│   │   ├── routes/ (index aggregator)
-│   │   ├── websocket/ (server, handlers)
-│   │   └── workspaces/ (packs, loader)
-│   ├── services/ (cacheService, loggerService, healthCheckService)
-│   ├── middleware/ (security, rateLimiter, auth/validation auxiliares)
-│   ├── scripts/ (backup.sh)
-│   └── tests/ (unit, integration)
+│   │   ├── config/            # Database, env, logger, theme
+│   │   ├── core/
+│   │   │   ├── engine/        # FSM (ReisTech, StateMachine, Router, DossierBuilder)
+│   │   │   ├── errors/        # AppError, errorHandler
+│   │   │   ├── middleware/    # Auth, validation
+│   │   │   └── utils/         # Helpers
+│   │   ├── db/
+│   │   │   ├── migrations/    # 11 migrations
+│   │   │   ├── models/        # Sequelize models
+│   │   │   └── seeds/         # Dados iniciais
+│   │   ├── modules/
+│   │   │   ├── admin/         # Gestão administrativa
+│   │   │   ├── auth/          # JWT authentication
+│   │   │   ├── catalogo/      # Produtos e importação CSV
+│   │   │   ├── cms/           # Textos configuráveis
+│   │   │   ├── conversas/     # Histórico de conversas
+│   │   │   ├── fila/          # Fila humana
+│   │   │   ├── notifications/ # Notificações
+│   │   │   ├── reports/       # Relatórios
+│   │   │   ├── whatsapp/      # Integração WhatsApp
+│   │   │   └── workspaces/    # Gestão de workspaces
+│   │   ├── routes/            # Agregador de rotas
+│   │   ├── websocket/         # WebSocket server
+│   │   └── workspaces/
+│   │       └── packs/         # JSON files (iphone_store, law_firm, motorcycle_shop)
+│   │
+│   ├── services/              # Cache, logger, health check
+│   ├── middleware/            # Security, rate limiter
+│   ├── scripts/               # Backup scripts
+│   ├── tests/
+│   │   ├── unit/              # Testes unitários (Jest)
+│   │   └── integration/       # Testes de integração
+│   ├── logs/                  # Application logs
+│   ├── uploads/               # Arquivos enviados
+│   └── whatsapp-sessions/     # Sessões WhatsApp
+│
 ├── frontend/
+│   ├── .env                   # Variáveis frontend
+│   ├── Dockerfile.prod        # Container produção (nginx)
+│   ├── vite.config.js         # Vite configuration
+│   │
 │   ├── src/
-│   │   ├── components/ (layout, notifications)
-│   │   ├── pages/ (Dashboard, Conversas, FilaHumana, Catalogo, TextosCms, WhatsApp, Login, Configuracao, Relatorios)
-│   │   ├── services/ (api)
-│   │   ├── store/ (authSlice, uiSlice)
-│   │   └── config/contexts/main.jsx
-├── docs/ (guias, diagramas, endpoints, SQL, especificação)
-├── scripts/ (deploy, backup, limpeza, teste, PREPARE_FOR_WINDOWS)
-├── docker-compose.yml / docker-compose.prod.yml
-└── .github/ .vscode/ logs/ postgres/
+│   │   ├── components/        # Layout, notificações
+│   │   ├── pages/
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Conversas.jsx
+│   │   │   ├── FilaHumana.jsx
+│   │   │   ├── Catalogo.jsx
+│   │   │   ├── TextosCms.jsx
+│   │   │   ├── WhatsApp.jsx
+│   │   │   ├── Login.jsx
+│   │   │   ├── Configuracao.jsx
+│   │   │   └── Relatorios.jsx
+│   │   ├── services/          # API client (Axios)
+│   │   ├── store/             # Redux (auth, ui)
+│   │   ├── contexts/          # React contexts
+│   │   └── config/            # Configurações
+│   │
+│   ├── cypress/               # Testes E2E
+│   └── tests/                 # Testes Jest
+│
+├── docs/
+│   ├── ESTRUTURA.md           # Estrutura detalhada
+│   ├── SETUP_LOCAL.md         # Setup desenvolvimento
+│   ├── MIGRATION_GUIDE.md     # Guia de migração
+│   ├── OTIMIZACAO_PRODUCAO.md # Deploy produção
+│   ├── ORGANIZACAO.md         # Organização do projeto
+│   ├── reistech_especificacao_tecnica.md
+│   ├── api_endpoints_documentacao.yaml
+│   ├── estrutura_banco_dados.sql
+│   ├── diagrama_arquitetura_sistema.txt
+│   ├── fluxos_conversacionais_nichos.csv
+│   │
+│   ├── github/                # Docs do GitHub
+│   │   ├── CODE_OF_CONDUCT.md
+│   │   ├── CONTRIBUTING.md
+│   │   ├── GITHUB_SETUP.md
+│   │   └── GITHUB_CHECKLIST.md
+│   │
+│   ├── archive/               # Docs arquivados
+│   │   ├── STATUS_FINAL.md
+│   │   └── NEXTEPS_STATUS.md
+│   │
+│   └── manuals/               # Manuais arquivados
+│       └── manual-reistech-legacy.html
+│
+├── scripts/
+│   ├── deploy-production.sh   # Deploy para produção
+│   ├── backup-projeto.sh      # Backup completo
+│   ├── limpar-macbook.sh      # Limpeza de arquivos
+│   ├── auditoria-macbook.sh   # Auditoria de segurança
+│   ├── verificar-tudo.sh      # Verificação completa
+│   └── PREPARE_FOR_WINDOWS.sh # Preparação para Windows
+│
+├── postgres/
+│   └── init.sql               # Inicialização PostgreSQL
+│
+└── .vscode/                   # Configurações VS Code
+    ├── launch.json
+    ├── settings.json
+    └── tasks.json
 ```
 
 
-## Troubleshooting
+## 🤝 Contribuindo
 
-- WhatsApp não conecta: valide QR Code, conexão do celular e sessão Web.
-- Banco falha: verifique credenciais e execute migrations novamente.
-- Painel não carrega: confirme API em http://localhost:3000.
+Consulte [CONTRIBUTING.md](docs/github/CONTRIBUTING.md) para diretrizes de contribuição.
 
-## Suporte
+## 📄 Licença
 
-- Consulte logs em backend/logs.
-- Abra uma issue com detalhes de reprodução.
+Este projeto é proprietário. Copyright © 2024-2026 ReisTech. Todos os direitos reservados.
 
-## Licença
+## 📞 Suporte
 
-Copyright © 2024 ReisTech. Todos os direitos reservados.
+- Consulte os logs em `backend/logs/`
+- Verifique a [documentação completa](docs/) para troubleshooting
+- Abra uma issue no GitHub com detalhes para reprodução
+
+## 🔗 Links Úteis
+
+- [Manual Oficial](MANUAL-OFICIAL.html) - Setup Windows + MacBook
+- [API Documentation](docs/api_endpoints_documentacao.yaml)
+- [Database Schema](docs/estrutura_banco_dados.sql)
+- [Architecture Diagram](docs/diagrama_arquitetura_sistema.txt)
