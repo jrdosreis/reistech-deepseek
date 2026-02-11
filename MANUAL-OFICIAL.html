@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Reistech-DeepSeek – Configuração Final</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #1e2b3c;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px 50px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-radius: 12px;
+        }
+        h1, h2, h3 {
+            color: #0a3e5c;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-weight: 600;
+            border-bottom: 2px solid #e6eef2;
+            padding-bottom: 0.3em;
+        }
+        h1 {
+            font-size: 2.2em;
+            border-bottom: 3px solid #0077b6;
+            color: #005f8c;
+            margin-top: 0.5em;
+        }
+        .badge {
+            display: inline-block;
+            background: #0a3e5c;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 8px;
+        }
+        .code-block {
+            background: #1e2b3c;
+            color: #e6eef2;
+            padding: 16px 20px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+            font-size: 0.95em;
+            overflow-x: auto;
+            margin: 1.5em 0;
+            border-left: 5px solid #00b4d8;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .code-inline {
+            background: #e9ecef;
+            color: #0a3e5c;
+            padding: 0.2em 0.5em;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.95em;
+        }
+        .note {
+            background: #e0f7fa;
+            border-left: 6px solid #00acc1;
+            padding: 16px 24px;
+            border-radius: 10px;
+            margin: 1.8em 0;
+        }
+        .warning {
+            background: #fff3e0;
+            border-left: 6px solid #ff9800;
+            padding: 16px 24px;
+            border-radius: 10px;
+            margin: 1.8em 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+        }
+        th {
+            background: #0a3e5c;
+            color: white;
+            padding: 12px 8px;
+        }
+        td, th {
+            border: 1px solid #cbd5e0;
+            padding: 10px 8px;
+            text-align: left;
+        }
+        hr {
+            border: none;
+            border-top: 2px dashed #b0c4ce;
+            margin: 2.5em 0;
+        }
+        .footer {
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #cbd5e0;
+            text-align: center;
+            font-size: 0.9em;
+            color: #4a6476;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<!-- TÍTULO PRINCIPAL -->
+<h1 style="text-align: center; border-bottom: none;">🚀 REISTECH-DEEPSEEK</h1>
+<p style="text-align: center; font-size: 1.3em; color: #005f8c;">Manual de Configuração Definitivo</p>
+<div style="background: linear-gradient(145deg, #f0f9ff, #ffffff); padding: 24px; border-radius: 16px; margin-bottom: 30px; border: 1px solid #b8e2f2;">
+    <p><span class="badge">✅ IP DO WINDOWS</span> <strong style="background: #0a3e5c; color: white; padding: 6px 16px; border-radius: 30px;">192.168.100.232</strong></p>
+    <p><span class="badge">🔗 REPOSITÓRIO</span> <code style="background: #e9ecef; padding: 6px 12px; border-radius: 8px;">https://github.com/jrdosreis/reistech-deepseek.git</code></p>
+    <p><span class="badge">📅 DATA</span> 11 de Fevereiro de 2026</p>
+    <p><span class="badge">🔐 SEGREDOS</span> Todos os arquivos <code>.env</code> reais estão no <code>.gitignore</code> e NUNCA são commitados.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- PARTE 1 – WINDOWS (SERVIDOR DOCKER) -->
+<!-- ============================================ -->
+<h1>🪟 PARTE 1 – CONFIGURAÇÃO DO WINDOWS</h1>
+
+<h2>1. INSTALAR O DOCKER DESKTOP</h2>
+<div class="code-block">
+# 1. Acesse: https://www.docker.com/products/docker-desktop/
+# 2. Download for Windows
+# 3. Execute o instalador (Docker Desktop Installer.exe)
+# 4. DURANTE A INSTALAÇÃO:
+#    ✅ Marque "Use WSL 2 instead of Hyper-V" (OBRIGATÓRIO)
+# 5. Reinicie o Windows quando solicitado
+</div>
+
+<h3>Verificar a instalação:</h3>
+<div class="code-block">
+docker --version
+docker-compose --version
+docker run hello-world
+</div>
+
+<h2>2. CONFIGURAR ACESSO REMOTO (PORTA 2375)</h2>
+<p><strong>Opção A – Interface Gráfica (RECOMENDADA):</strong></p>
+<ol>
+    <li>Clique direito no ícone do Docker (bandeja do sistema) → <strong>Settings</strong>.</li>
+    <li>Vá em <strong>General</strong>.</li>
+    <li>MARQUE: <strong>"Expose daemon on tcp://localhost:2375 without TLS"</strong>.</li>
+    <li>Clique em <strong>Apply & Restart</strong>.</li>
+</ol>
+
+<h2>3. CONFIGURAR O FIREWALL DO WINDOWS</h2>
+<div class="code-block">
+New-NetFirewallRule -DisplayName "Docker Daemon TCP 2375" `
+                    -Direction Inbound `
+                    -LocalPort 2375 `
+                    -Protocol TCP `
+                    -Action Allow
+</div>
+
+<h2>4. OBTER O IP DO WINDOWS</h2>
+<div class="code-block">
+(Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like "*Wi-Fi*" -or $_.InterfaceAlias -like "*Ethernet*"}).IPAddress | Select-Object -First 1
+</div>
+<p><strong>IP já definido neste manual:</strong> <code style="background: #0a3e5c; color: white; padding: 4px 12px; border-radius: 20px;">192.168.100.232</code></p>
+
+<h2>5. CLONAR O REPOSITÓRIO E CRIAR A ESTRUTURA</h2>
+<div class="code-block">
+cd C:\
+git clone https://github.com/jrdosreis/reistech-deepseek.git
+cd reistech-deepseek
+</div>
+<p><strong>Pasta de trabalho:</strong> <code>C:\reistech-deepseek</code></p>
+
+<h2>6. CRIAR OS ARQUIVOS <code>.env</code> REAIS (COM CREDENCIAIS DEFINITIVAS)</h2>
+
+<h3>📁 6.1 Arquivo <code>C:\reistech-deepseek\.env</code> (RAIZ)</h3>
+<div class="code-block">
+# ============================================================================
+# REISTECH-DEEPSEEK - CONFIGURAÇÃO REAL (DOCKER)
+# ============================================================================
+APP_NAME="Reistech"
+APP_VERSION="1.0.0"
+LOG_LEVEL="debug"
+NODE_ENV=development
+API_PREFIX=/api
+PORT=3000
+
+# PostgreSQL
+DB_HOST=postgres
+DB_PORT=5432
+DB_NAME=reistechdb
+DB_USER=reistechuser
+DB_PASSWORD="UaLL8awGvxAXMNYFakXG/F9Ggof+zzbTeEpkW0sgBcE="
+DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
+DB_SSL=false
+DB_POOL_MIN=2
+DB_POOL_MAX=10
+
+# Redis
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_URL="redis://${REDIS_HOST}:${REDIS_PORT}"
+
+# JWT
+JWT_SECRET="WttV2yKYWiUUy1qnw7BHCMblVs8OjDrQLTEowHTv2DiiZQCxcoT/DwJF40n48zIqkEvyJXubjSwEaXQ0i+T9bA=="
+JWT_REFRESH_SECRET="YHWG4Jj0BzrMIVpWDM4utMe2LCeSqcUaQ1gW/yrGgcYESheJg66SyaYeynDyr/KF414ZXVY6X7ih74VMi312JA=="
+JWT_ACCESS_EXPIRY="15m"
+JWT_REFRESH_EXPIRY="30d"
+
+# Admin
+ADMIN_EMAIL="contato@reiscelulares.com.br"
+ADMIN_PASSWORD="admin@reiscelulares"
+ADMIN_NAME="Junior Reis"
+
+# SMTP Hostinger
+SMTP_HOST="smtp.hostinger.com"
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER="contato@reiscelulares.com.br"
+SMTP_PASSWORD="madtig-0wemro-soFnub"
+SMTP_FROM="Reistech <contato@reiscelulares.com.br>"
+
+# CORS e Domínios
+API_DOMAIN="http://192.168.100.232:3000"
+WEB_DOMAIN="http://192.168.100.232"
+ACME_EMAIL="contato@reiscelulares.com.br"
+CORS_ORIGIN="http://localhost,http://192.168.100.232,http://127.0.0.1"
+
+# WhatsApp
+WHATSAPP_SESSION_PATH=./whatsapp-sessions
+WHATSAPP_PUPPETEER_ARGS=--no-sandbox,--disable-setuid-sandbox
+
+# Uploads
+UPLOAD_PATH=./uploads
+UPLOAD_DIR=./uploads
+MAX_FILE_SIZE=10485760
+
+# Backup
+BACKUP_DIR=./backups
+BACKUP_RETENTION_DAYS=30
+BACKUP_SCHEDULE="0 2 * * *"
+BACKUP_ENABLED=true
+
+# Timezone
+TZ=America/Sao_Paulo
+</div>
+
+<h3>📁 6.2 Arquivo <code>C:\reistech-deepseek\backend\.env</code> (BACKEND – execução local sem Docker)</h3>
+<div class="code-block">
+# ============================================================================
+# BACKEND - CONFIGURAÇÃO PARA EXECUÇÃO DIRETA (NPM RUN DEV)
+# ============================================================================
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=reistechdb
+DB_USER=reistechuser
+DB_PASSWORD="UaLL8awGvxAXMNYFakXG/F9Ggof+zzbTeEpkW0sgBcE="
+DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
+
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_URL="redis://${REDIS_HOST}:${REDIS_PORT}"
+
+JWT_SECRET="WttV2yKYWiUUy1qnw7BHCMblVs8OjDrQLTEowHTv2DiiZQCxcoT/DwJF40n48zIqkEvyJXubjSwEaXQ0i+T9bA=="
+JWT_REFRESH_SECRET="YHWG4Jj0BzrMIVpWDM4utMe2LCeSqcUaQ1gW/yrGgcYESheJg66SyaYeynDyr/KF414ZXVY6X7ih74VMi312JA=="
+JWT_ACCESS_EXPIRY="15m"
+JWT_REFRESH_EXPIRY="30d"
+
+ADMIN_EMAIL="contato@reiscelulares.com.br"
+ADMIN_PASSWORD="admin@reiscelulares"
+ADMIN_NAME="Junior Reis"
+
+SMTP_HOST="smtp.hostinger.com"
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER="contato@reiscelulares.com.br"
+SMTP_PASSWORD="madtig-0wemro-soFnub"
+SMTP_FROM="Reistech <contato@reiscelulares.com.br>"
+
+CORS_ORIGIN="http://localhost,http://127.0.0.1"
+PORT=3000
+NODE_ENV=development
+</div>
+
+<h3>📁 6.3 Arquivo <code>C:\reistech-deepseek\frontend\.env</code> (FRONTEND – VITE)</h3>
+<div class="code-block">
+VITE_API_URL=http://192.168.100.232:3000
+VITE_WS_URL=ws://192.168.100.232:3000
+VITE_APP_NAME=Reistech
+VITE_APP_VERSION=1.0.0
+VITE_DEBUG=false
+VITE_REQUEST_TIMEOUT=30000
+VITE_WS_MAX_RETRIES=5
+VITE_WS_RETRY_INTERVAL=3000
+</div>
+
+<div class="warning">
+    <strong>⚠️ NUNCA COMMITE ESTES ARQUIVOS!</strong> Eles já estão no .gitignore. Utilize os arquivos <code>.env.example</code> e <code>frontend/.env.example</code> para documentação pública.
+</div>
+
+<h2>7. VERIFICAR O ARQUIVO <code>docker-compose.yml</code></h2>
+<p>O repositório já contém um <code>docker-compose.yml</code> funcional. Certifique-se de que ele usa as variáveis do <code>.env</code> da raiz.</p>
+
+<h2>8. TESTE INICIAL NO WINDOWS</h2>
+<div class="code-block">
+cd C:\reistech-deepseek
+docker run -d -p 8080:80 --name test-nginx nginx
+docker ps
+# Acesse http://localhost:8080 – página do nginx deve aparecer
+docker stop test-nginx
+docker rm test-nginx
+</div>
+
+<h3>Verificar porta 2375:</h3>
+<div class="code-block">
+Test-NetConnection -ComputerName localhost -Port 2375
+# Resultado esperado: TcpTestSucceeded : True
+</div>
+
+<h2>9. RECURSOS DO DOCKER (RECOMENDADO)</h2>
+<ul>
+    <li>Abra Docker Desktop → Settings → Resources → Advanced.</li>
+    <li>CPUs: 2 ou mais; Memory: 4096 MB; Swap: 1024 MB.</li>
+    <li>Apply & Restart.</li>
+</ul>
+
+<h2>✅ CHECKLIST – WINDOWS PRONTO</h2>
+<ul>
+    <li>[ ] Docker Desktop instalado com WSL 2</li>
+    <li>[ ] Daemon exposto na porta 2375</li>
+    <li>[ ] Firewall liberado para porta 2375</li>
+    <li>[ ] IP do Windows: <strong>192.168.100.232</strong></li>
+    <li>[ ] Repositório clonado em <code>C:\reistech-deepseek</code></li>
+    <li>[ ] Arquivos <code>.env</code>, <code>backend/.env</code> e <code>frontend/.env</code> criados com as credenciais acima</li>
+    <li>[ ] <code>docker-compose.yml</code> presente</li>
+    <li>[ ] Teste do nginx executado com sucesso</li>
+    <li>[ ] Porta 2375 respondendo localmente</li>
+</ul>
+
+<hr>
+
+<!-- ============================================ -->
+<!-- PARTE 2 – MACBOOK (ESTAÇÃO DE TRABALHO) -->
+<!-- ============================================ -->
+<h1>💻 PARTE 2 – CONFIGURAÇÃO DO MACBOOK</h1>
+
+<h2>1. INSTALAR DOCKER CLI (APENAS CLIENTE)</h2>
+<div class="code-block">
+brew install docker docker-compose
+# Ou baixe os binários manualmente
+</div>
+
+<h2>2. CLONAR O REPOSITÓRIO</h2>
+<div class="code-block">
+cd ~
+git clone https://github.com/jrdosreis/reistech-deepseek.git
+cd reistech-deepseek
+</div>
+
+<h2>3. CONFIGURAR ACESSO REMOTO AO DOCKER DO WINDOWS</h2>
+<div class="code-block">
+export DOCKER_HOST="tcp://192.168.100.232:2375"
+echo 'export DOCKER_HOST="tcp://192.168.100.232:2375"' >> ~/.zshrc
+source ~/.zshrc
+</div>
+<p>Testar a conexão:</p>
+<div class="code-block">
+docker version
+# Deve mostrar Client (Mac) e Server (Windows)
+</div>
+
+<h2>4. (OPCIONAL) CRIAR ALIASES ÚTEIS</h2>
+<div class="code-block">
+alias docker-win='export DOCKER_HOST="tcp://192.168.100.232:2375"'
+alias dps='docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
+alias dlogs='docker-compose logs -f'
+alias dup='docker-compose up -d'
+alias ddown='docker-compose down'
+</div>
+
+<h2>✅ CHECKLIST – MACBOOK PRONTO</h2>
+<ul>
+    <li>[ ] Docker CLI instalado</li>
+    <li>[ ] Repositório clonado</li>
+    <li>[ ] <code>DOCKER_HOST</code> configurado com <code>192.168.100.232</code></li>
+    <li>[ ] <code>docker version</code> retorna Client e Server</li>
+</ul>
+
+<hr>
+
+<!-- ============================================ -->
+<!-- PARTE 3 – FLUXO DE TRABALHO COM GIT -->
+<!-- ============================================ -->
+<h1>🔄 PARTE 3 – FLUXO DE TRABALHO COM GIT</h1>
+
+<h2>🌿 ESTRATÉGIA DE BRANCHES</h2>
+<table>
+    <tr><th>Branch</th><th>Finalidade</th></tr>
+    <tr><td><code>main</code></td><td>Código estável, pronto para testes</td></tr>
+    <tr><td><code>feature/*</code></td><td>Desenvolvimento de novas funcionalidades</td></tr>
+    <tr><td><code>bugfix/*</code></td><td>Correção de bugs</td></tr>
+</table>
+
+<h2>👨‍💻 NO MACBOOK (DESENVOLVIMENTO)</h2>
+<div class="code-block">
+git checkout main
+git pull origin main
+git checkout -b feature/minha-feature
+# ... edite os arquivos ...
+git add .
+git commit -m "feat: descrição clara"
+git push origin feature/minha-feature
+</div>
+
+<h2>🖥️ NO WINDOWS (EXECUÇÃO E TESTE)</h2>
+<div class="code-block">
+cd C:\reistech-deepseek
+git checkout feature/minha-feature
+git pull origin feature/minha-feature
+docker-compose down
+docker-compose up -d --build
+</div>
+
+<h2>🔁 FINALIZAR A FEATURE</h2>
+<div class="code-block">
+# No MacBook
+git checkout main
+git pull origin main
+git merge feature/minha-feature
+git push origin main
+
+# No Windows
+git checkout main
+git pull origin main
+docker-compose down
+docker-compose up -d --build
+</div>
+
+<hr>
+
+<!-- ============================================ -->
+<!-- PARTE 4 – TESTES E ACESSO -->
+<!-- ============================================ -->
+<h1>🧪 PARTE 4 – TESTES E ACESSO</h1>
+
+<table>
+    <tr><th>Serviço</th><th>URL</th></tr>
+    <tr><td>Frontend</td><td><code>http://192.168.100.232</code></td></tr>
+    <tr><td>Backend API</td><td><code>http://192.168.100.232:3000</code></td></tr>
+    <tr><td>WebSocket</td><td><code>ws://192.168.100.232:3000</code></td></tr>
+    <tr><td>PostgreSQL</td><td><code>192.168.100.232:5432</code></td></tr>
+    <tr><td>Redis</td><td><code>192.168.100.232:6379</code></td></tr>
+</table>
+
+<hr>
+
+<!-- ============================================ -->
+<!-- PARTE 5 – SOLUÇÃO DE PROBLEMAS -->
+<!-- ============================================ -->
+<h1>🆘 PARTE 5 – SOLUÇÃO DE PROBLEMAS</h1>
+
+<h3>🔴 Docker no Windows não inicia</h3>
+<div class="code-block">
+wsl --set-default-version 2
+net stop com.docker.service
+net start com.docker.service
+</div>
+
+<h3>🔴 Porta 2375 não responde</h3>
+<div class="code-block">
+Get-NetFirewallRule -DisplayName "Docker*"
+Test-NetConnection localhost -Port 2375
+</div>
+
+<h3>🔴 MacBook não conecta</h3>
+<div class="code-block">
+ping 192.168.100.232
+telnet 192.168.100.232 2375
+</div>
+
+<h3>🔴 Containers não sobem</h3>
+<div class="code-block">
+docker-compose logs --tail=50
+</div>
+
+<hr>
+
+<!-- ============================================ -->
+<!-- PARTE 6 – SEGURANÇA E BACKUP -->
+<!-- ============================================ -->
+<h1>📦 PARTE 6 – SEGURANÇA E BACKUP</h1>
+
+<h3>🔒 PROTEÇÃO DOS ARQUIVOS .ENV</h3>
+<p>✅ Já estão no <code>.gitignore</code>. <strong>NUNCA</strong> execute <code>git add .env</code>.</p>
+
+<h3>💾 BACKUP DO BANCO</h3>
+<div class="code-block">
+docker exec reistech-postgres pg_dumpall -U reistechuser > ~/backup-$(date +%Y%m%d).sql
+</div>
+
+<h3>💾 BACKUP DO CÓDIGO</h3>
+<div class="code-block">
+tar -czf ~/Desktop/reistech-backup-$(date +%Y%m%d).tar.gz ~/reistech-deepseek
+</div>
+
+<hr>
+
+<!-- ============================================ -->
+<!-- FINAL -->
+<!-- ============================================ -->
+<div style="background: #0a3e5c; color: white; padding: 30px; border-radius: 16px; text-align: center; margin-top: 40px;">
+    <h2 style="color: white; border-bottom: none;">✅ AMBIENTE 100% PRONTO</h2>
+    <p style="font-size: 1.2em;">Windows: servidor Docker | MacBook: estação de trabalho</p>
+    <p style="font-size: 1.1em; margin-top: 10px;">IP: 192.168.100.232 | Repositório: jrdosreis/reistech-deepseek</p>
+    <p style="margin-top: 20px; font-size: 1.1em;">🚀 Agora é só codar!</p>
+</div>
+
+<div class="footer">
+    <p>Manual gerado em 11 de fevereiro de 2026 · Projeto Reistech-DeepSeek</p>
+    <p>Substitui completamente o PDF anterior. Mantenha esta versão como referência.</p>
+</div>
+
+</div> <!-- .container -->
+</body>
+</html>
