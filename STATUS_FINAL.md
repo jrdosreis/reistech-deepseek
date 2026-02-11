@@ -188,13 +188,13 @@ dist/                   # Build compilado
 
 ```bash
 # Editar frontend/.env
-VITE_API_URL=http://localhost:3001
-VITE_WS_URL=ws://localhost:3001
+VITE_API_URL=http://localhost:3000
+VITE_WS_URL=ws://localhost:3000
 
 # URLs de acesso
-Frontend: http://localhost:5173
-Backend:  http://localhost:3001
-WebSocket: ws://localhost:3001/ws
+Frontend: http://localhost
+Backend:  http://localhost:3000
+WebSocket: ws://localhost:3000/ws
 ```
 
 ### Windows IP (Acesso de Outra Máquina)
@@ -207,13 +207,13 @@ ifconfig | grep "inet " | grep -v 127.0.0.1
 # Exemplo: inet 192.168.100.232
 
 # Editar frontend/.env
-VITE_API_URL=http://192.168.100.232:3001
-VITE_WS_URL=ws://192.168.100.232:3001
+VITE_API_URL=http://192.168.100.232:3000
+VITE_WS_URL=ws://192.168.100.232:3000
 
 # URLs de acesso
-Frontend: http://192.168.100.232:5173
-Backend:  http://192.168.100.232:3001
-WebSocket: ws://192.168.100.232:3001/ws
+Frontend: http://192.168.100.232
+Backend:  http://192.168.100.232:3000
+WebSocket: ws://192.168.100.232:3000/ws
 ```
 
 ### Credenciais Padrão
@@ -393,9 +393,9 @@ Senha: Admin123!
 
 | Serviço | Porta | URL |
 |---------|-------|-----|
-| Frontend | 5173 | http://localhost:5173 |
-| Backend API | 3001 | http://localhost:3001 |
-| WebSocket | 3001 | ws://localhost:3001 |
+| Frontend | 80 | http://localhost |
+| Backend API | 3000 | http://localhost:3000 |
+| WebSocket | 3000 | ws://localhost:3000 |
 | PostgreSQL | 5432 | localhost:5432 |
 | Redis | 6379 | localhost:6379 |
 

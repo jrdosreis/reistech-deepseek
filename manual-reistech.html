@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Reistech – Docker Windows + MacBook</title>
+    <style>
+        /* RESET e ESTILOS GLOBAIS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #1e2b3c;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px 50px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-radius: 12px;
+        }
+        h1, h2, h3 {
+            color: #0a3e5c;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            font-weight: 600;
+            border-bottom: 2px solid #e6eef2;
+            padding-bottom: 0.3em;
+        }
+        h1 {
+            font-size: 2.2em;
+            border-bottom: 3px solid #0077b6;
+            color: #005f8c;
+            margin-top: 0.5em;
+        }
+        h2 {
+            font-size: 1.6em;
+        }
+        h3 {
+            font-size: 1.3em;
+            border-bottom: none;
+            margin-bottom: 0.2em;
+        }
+        p {
+            margin-bottom: 1em;
+            font-size: 1.05em;
+        }
+        ul, ol {
+            margin: 0.8em 0 1.5em 1.8em;
+        }
+        li {
+            margin-bottom: 0.4em;
+        }
+        .code-block {
+            background: #1e2b3c;
+            color: #e6eef2;
+            padding: 16px 20px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+            font-size: 0.95em;
+            overflow-x: auto;
+            margin: 1.5em 0;
+            border-left: 5px solid #00b4d8;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .code-inline {
+            background: #e9ecef;
+            color: #0a3e5c;
+            padding: 0.2em 0.5em;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.95em;
+        }
+        .note, .warning, .tip {
+            padding: 16px 24px;
+            border-radius: 10px;
+            margin: 1.8em 0;
+            font-weight: 500;
+        }
+        .note {
+            background: #e0f7fa;
+            border-left: 6px solid #00acc1;
+        }
+        .warning {
+            background: #fff3e0;
+            border-left: 6px solid #ff9800;
+        }
+        .tip {
+            background: #e8f5e9;
+            border-left: 6px solid #2e7d32;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+            font-size: 0.98em;
+        }
+        th {
+            background: #0a3e5c;
+            color: white;
+            padding: 12px 8px;
+            font-weight: 600;
+        }
+        td, th {
+            border: 1px solid #cbd5e0;
+            padding: 10px 8px;
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        hr {
+            border: none;
+            border-top: 2px dashed #b0c4ce;
+            margin: 2.5em 0;
+        }
+        .badge {
+            display: inline-block;
+            background: #0a3e5c;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 8px;
+        }
+        .footer {
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #cbd5e0;
+            text-align: center;
+            font-size: 0.9em;
+            color: #4a6476;
+        }
+        @media print {
+            body {
+                background: white;
+                padding: 0.1in;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0.2in;
+            }
+            .code-block {
+                background: #f1f5f9;
+                color: #1e2b3c;
+                border: 1px solid #94a3b8;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<!-- TÍTULO PRINCIPAL -->
+<h1 style="text-align: center; border-bottom: none; margin-bottom: 0.2em;">🚀 REISTECH-DEEPSEEK</h1>
+<p style="text-align: center; font-size: 1.3em; color: #005f8c; margin-top: 0;"><strong>Manual de Configuração</strong></p>
+<p style="text-align: center; font-size: 1.1em; margin-bottom: 2em;">Docker no Windows + Desenvolvimento no MacBook com Git/GitHub</p>
+
+<!-- INFORMAÇÕES GLOBAIS -->
+<div style="background: linear-gradient(145deg, #f0f9ff, #ffffff); padding: 24px; border-radius: 16px; margin-bottom: 30px; border: 1px solid #b8e2f2;">
+    <p style="font-size: 1.1em; margin-bottom: 0;"><span class="badge">📌 IP DO WINDOWS</span> <strong style="background: #0a3e5c; color: white; padding: 6px 16px; border-radius: 30px;">192.168.100.232</strong></p>
+    <p style="margin-top: 12px;"><span class="badge">🔗 REPOSITÓRIO</span> <code style="background: #e9ecef; padding: 6px 12px; border-radius: 8px;">https://github.com/jrdosreis/reistech-deepseek</code></p>
+    <p><span class="badge">📅 DATA</span> 11 de Fevereiro de 2026</p>
+</div>
+
+<!-- ============================================ -->
+<!-- VISÃO GERAL -->
+<!-- ============================================ -->
+<h2>📋 VISÃO GERAL DO AMBIENTE</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Equipamento</th>
+            <th>Função</th>
+            <th>Sistema</th>
+            <th>Ferramentas</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>MacBook</strong></td>
+            <td>Estação de desenvolvimento (código, commits)</td>
+            <td>macOS</td>
+            <td>VS Code, Git, Docker CLI (cliente)</td>
+        </tr>
+        <tr>
+            <td><strong>PC Windows</strong></td>
+            <td>Servidor de containers (Docker host)</td>
+            <td>Windows 10/11</td>
+            <td>Docker Desktop, Git, WSL 2</td>
+        </tr>
+        <tr>
+            <td><strong>GitHub</strong></td>
+            <td>Sincronização e backup do código</td>
+            <td>–</td>
+            <td>Repositório remoto</td>
+        </tr>
+    </tbody>
+</table>
+<div class="note">
+    <strong>🎯 Fluxo resumido:</strong> Você escreve o código no MacBook → commit + push → Windows faz pull da branch → containers reiniciam com código novo → você acessa via navegador no MacBook usando o IP <strong>192.168.100.232</strong>.
+</div>
+
+<hr>
+
+<!-- ============================================ -->
+<!-- PARTE 1 – WINDOWS (SERVIDOR DOCKER) -->
+<!-- ============================================ -->
+<h1 style="border-bottom-color: #0077b6;">🪟 PARTE 1 – CONFIGURAÇÃO DO WINDOWS</h1>
+<p><em>Execute todos os passos no PC com Windows.</em></p>
+
+<h2>1. INSTALAR O DOCKER DESKTOP</h2>
+<h3>1.1 Download e instalação</h3>
+<div class="code-block">
+# 1. Acesse: https://www.docker.com/products/docker-desktop/
+# 2. Clique em "Download for Windows"
+# 3. Execute o instalador (Docker Desktop Installer.exe)
+# 4. Durante a instalação:
+#    ✅ Marque "Use WSL 2 instead of Hyper-V" (OBRIGATÓRIO)
+#    ✅ Aceite os termos
+# 5. Reinicie o computador quando solicitado
+</div>
+
+<h3>1.2 Verifique a instalação</h3>
+<div class="code-block">
+# Abra o PowerShell como Administrador
+docker --version
+docker-compose --version
+docker run hello-world
+</div>
+<p><strong>Resultado esperado:</strong> mensagem de boas‑vindas do Docker.</p>
+
+<h2>2. CONFIGURAR ACESSO REMOTO (PORTA 2375)</h2>
+<h3>🔸 Opção A – Interface Gráfica (RECOMENDADA)</h3>
+<ol>
+    <li>Clique com botão direito no ícone do Docker (bandeja do sistema) → <strong>Settings</strong>.</li>
+    <li>Vá em <strong>General</strong>.</li>
+    <li>Marque: <strong>"Expose daemon on tcp://localhost:2375 without TLS"</strong>.</li>
+    <li>Clique em <strong>Apply & Restart</strong>.</li>
+</ol>
+<h3>🔸 Opção B – Arquivo de configuração</h3>
+<ol>
+    <li>Docker Desktop → <strong>Settings</strong> → <strong>Docker Engine</strong>.</li>
+    <li>Substitua o conteúdo por:</li>
+</ol>
+<div class="code-block">
+{
+  "hosts": ["tcp://0.0.0.0:2375", "npipe://"],
+  "experimental": false
+}
+</div>
+<ol start="3"><li>Apply & Restart.</li></ol>
+
+<h2>3. CONFIGURAR O FIREWALL DO WINDOWS</h2>
+<h3>🔹 Método rápido (PowerShell)</h3>
+<div class="code-block">
+New-NetFirewallRule -DisplayName "Docker Daemon TCP 2375" `
+                    -Direction Inbound `
+                    -LocalPort 2375 `
+                    -Protocol TCP `
+                    -Action Allow
+</div>
+<h3>🔹 Método manual</h3>
+<ol>
+    <li>Abra <strong>Firewall do Windows com Segurança Avançada</strong>.</li>
+    <li>Clique em <strong>Regras de Entrada</strong> → <strong>Nova Regra</strong>.</li>
+    <li><strong>Tipo de regra:</strong> Porta → <strong>TCP</strong> → <strong>Portas específicas:</strong> <code>2375</code>.</li>
+    <li><strong>Ação:</strong> Permitir a conexão.</li>
+    <li><strong>Perfil:</strong> Marque todas (Domínio, Privada, Pública).</li>
+    <li><strong>Nome:</strong> <code>Docker Daemon TCP 2375</code>.</li>
+    <li>Concluir.</li>
+</ol>
+
+<h2>4. OBTER O IP DO WINDOWS NA REDE</h2>
+<div class="code-block">
+# No PowerShell, execute:
+(Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like "*Wi-Fi*" -or $_.InterfaceAlias -like "*Ethernet*"}).IPAddress | Select-Object -First 1
+</div>
+<div class="tip">
+    <strong>✅ IP já definido neste manual:</strong> <span style="background: #0a3e5c; color: white; padding: 4px 14px; border-radius: 20px;">192.168.100.232</span>
+</div>
+
+<h2>5. CLONAR O REPOSITÓRIO E CRIAR A ESTRUTURA</h2>
+<div class="code-block">
+cd C:\
+git clone https://github.com/jrdosreis/reistech-deepseek.git
+cd reistech-deepseek
+</div>
+
+<h2>6. CRIAR OS ARQUIVOS <code>.env</code> (COM O IP CORRETO)</h2>
+<h3>📄 Arquivo <code>C:\reistech-deepseek\.env</code></h3>
+<div class="code-block">
+# ============================================================================
+# REISTECH-DEEPSEEK - DESENVOLVIMENTO LOCAL (WINDOWS)
+# ============================================================================
+# ✅ IP do Windows: 192.168.100.232
+# ============================================================================
+
+APP_NAME="Reistech"
+APP_VERSION="1.0.0"
+LOG_LEVEL="debug"
+NODE_ENV=development
+API_PREFIX=/api
+PORT=3000
+
+# PostgreSQL
+DB_HOST=postgres
+DB_PORT=5432
+DB_NAME=reistechdb
+DB_USER=reistechuser
+DB_PASSWORD="UaLL8awGvxAXMNYFakXG/F9Ggof+zzbTeEpkW0sgBcE="
+DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
+
+# Redis
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_URL="redis://${REDIS_HOST}:${REDIS_PORT}"
+
+# JWT
+JWT_SECRET="WttV2yKYWiUUy1qnw7BHCMblVs8OjDrQLTEowHTv2DiiZQCxcoT/DwJF40n48zIqkEvyJXubjSwEaXQ0i+T9bA=="
+JWT_REFRESH_SECRET="YHWG4Jj0BzrMIVpWDM4utMe2LCeSqcUaQ1gW/yrGgcYESheJg66SyaYeynDyr/KF414ZXVY6X7ih74VMi312JA=="
+JWT_ACCESS_EXPIRY="15m"
+JWT_REFRESH_EXPIRY="30d"
+
+# Admin inicial
+ADMIN_EMAIL="contato@reiscelulares.com.br"
+ADMIN_PASSWORD="admin@reiscelulares"
+ADMIN_NAME="Junior Reis"
+
+# SMTP (Hostinger)
+SMTP_HOST="smtp.hostinger.com"
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER="contato@reiscelulares.com.br"
+SMTP_PASSWORD="madtig-0wemro-soFnub"
+SMTP_FROM="Reistech <contato@reiscelulares.com.br>"
+
+# Notificações (opcional)
+SLACK_WEBHOOK_URL=
+SLACK_CHANNEL=
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+
+# Observabilidade (opcional)
+SENTRY_DSN=
+NEW_RELIC_LICENSE_KEY=
+NEW_RELIC_APP_NAME=
+
+# AWS / CDN (não usado em dev)
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_REGION=
+AWS_BACKUP_BUCKET=
+CDN_URL=
+CDN_BUCKET=
+
+# Domínios e CORS (IP DO WINDOWS)
+API_DOMAIN="http://192.168.100.232:3000"
+WEB_DOMAIN="http://192.168.100.232"
+ACME_EMAIL="contato@reiscelulares.com.br"
+CORS_ORIGIN="http://localhost,http://192.168.100.232,http://127.0.0.1"
+
+# Backup local
+BACKUP_DIR="/backups"
+BACKUP_RETENTION_DAYS=7
+BACKUP_SCHEDULE="0 2 * * *"
+
+# Uploads
+MAX_FILE_SIZE=10485760
+UPLOAD_PATH=./uploads
+UPLOAD_DIR=./uploads
+
+# WhatsApp
+WHATSAPP_SESSION_PATH=./whatsapp-sessions
+WHATSAPP_PUPPETEER_ARGS=--no-sandbox,--disable-setuid-sandbox
+</div>
+
+<h3>📄 Arquivo <code>C:\reistech-deepseek\frontend\.env</code></h3>
+<div class="code-block">
+VITE_API_URL=http://192.168.100.232:3000
+VITE_WS_URL=ws://192.168.100.232:3000
+VITE_APP_NAME=Reistech
+VITE_APP_VERSION=1.0.0
+</div>
+
+<h2>7. VERIFICAR O ARQUIVO <code>docker-compose.yml</code></h2>
+<p>O repositório já contém um arquivo funcional. Utilize este modelo validado se necessário:</p>
+<div class="code-block">
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: reistech-postgres
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: reistech-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  backend:
+    image: node:18-alpine
+    container_name: reistech-backend
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+    ports:
+      - "${PORT}:${PORT}"
+    volumes:
+      - ./backend:/usr/src/app
+    working_dir: /usr/src/app
+    command: sh -c "npm install && npm run dev"
+    restart: unless-stopped
+
+  frontend:
+    image: node:18-alpine
+    container_name: reistech-frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:3000"
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+    command: sh -c "npm install && npm start"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+</div>
+
+<h2>8. TESTE INICIAL NO WINDOWS</h2>
+<h3>8.1 Teste rápido com nginx</h3>
+<div class="code-block">
+cd C:\reistech-deepseek
+docker run -d -p 8080:80 --name test-nginx nginx
+docker ps
+</div>
+<p>Acesse <code>http://localhost:8080</code> – deve aparecer a página padrão do nginx. Depois:</p>
+<div class="code-block">
+docker stop test-nginx
+docker rm test-nginx
+</div>
+<h3>8.2 Verifique se a porta 2375 está acessível</h3>
+<div class="code-block">
+Test-NetConnection -ComputerName localhost -Port 2375
+</div>
+<p><strong>Resultado:</strong> <code>TcpTestSucceeded : True</code></p>
+
+<h2>9. CONFIGURAÇÕES ADICIONAIS (RECOMENDADO)</h2>
+<h3>9.1 Ajustar recursos do Docker</h3>
+<ol>
+    <li>Abra Docker Desktop → Settings → Resources.</li>
+    <li><strong>Advanced:</strong> CPUs: 2 ou 4; Memory: 4096 MB; Swap: 1024 MB.</li>
+    <li>Apply & Restart.</li>
+</ol>
+<h3>9.2 Habilitar Docker Compose V2</h3>
+<ol>
+    <li>Settings → General.</li>
+    <li>Marque "Use Docker Compose V2".</li>
+    <li>Apply & Restart.</li>
+</ol>
+
+<h2>10. SCRIPT DE VERIFICAÇÃO FINAL (OPCIONAL)</h2>
+<p>Crie <code>C:\reistech-deepseek\verificar-windows.ps1</code> com o conteúdo abaixo e execute:</p>
+<div class="code-block">
+Write-Host "=== VERIFICAÇÃO DO WINDOWS PARA DOCKER REMOTO ===" -ForegroundColor Cyan
+
+Write-Host "`n1. Docker:" -ForegroundColor Yellow
+docker --version
+docker-compose --version
+
+Write-Host "`n2. IP da rede:" -ForegroundColor Yellow
+$ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -like "*Wi-Fi*" -or $_.InterfaceAlias -like "*Ethernet*"}).IPAddress | Select-Object -First 1
+Write-Host "IP: $ip"
+
+Write-Host "`n3. Porta 2375:" -ForegroundColor Yellow
+$portTest = Test-NetConnection -ComputerName localhost -Port 2375 -WarningAction SilentlyContinue
+if ($portTest.TcpTestSucceeded) {
+    Write-Host "✅ Porta 2375 aberta e acessível" -ForegroundColor Green
+} else {
+    Write-Host "❌ Porta 2375 fechada" -ForegroundColor Red
+}
+
+Write-Host "`n4. Serviço Docker:" -ForegroundColor Yellow
+$dockerService = Get-Service -Name "com.docker.service" -ErrorAction SilentlyContinue
+if ($dockerService.Status -eq "Running") {
+    Write-Host "✅ Docker Service rodando" -ForegroundColor Green
+} else {
+    Write-Host "❌ Docker Service não está rodando" -ForegroundColor Red
+}
+
+Write-Host "`n5. Containers ativos:" -ForegroundColor Yellow
+docker ps
+
+Write-Host "`n=== FIM DA VERIFICAÇÃO ===" -ForegroundColor Cyan
+Write-Host "IP para configurar no MacBook: $ip" -ForegroundColor Magenta
+</div>
+
+<h2>✅ CHECKLIST – WINDOWS PRONTO</h2>
+<ul>
+    <li>[ ] Docker Desktop instalado com WSL 2</li>
+    <li>[ ] Daemon exposto na porta 2375</li>
+    <li>[ ] Firewall liberado para porta 2375</li>
+    <li>[ ] IP do Windows anotado: <strong>192.168.100.232</strong></li>
+    <li>[ ] Repositório clonado em <code>C:\reistech-deepseek</code></li>
+    <li>[ ] Arquivo <code>.env</code> criado com IP e senhas corretos</li>
+    <li>[ ] Arquivo <code>frontend/.env</code> criado com IP correto</li>
+    <li>[ ] <code>docker-compose.yml</code> presente e validado</li>
+    <li>[ ] Teste do nginx executado com sucesso</li>
+    <li>[ ] Porta 2375 respondendo localmente</li>
+</ul>
+
+<hr>
+
+<!-- ============================================ -->
+<!-- PARTE 2 – MACBOOK (ESTAÇÃO DE TRABALHO) -->
+<!-- ============================================ -->
+<h1 style="border-bottom-color: #0077b6;">💻 PARTE 2 – CONFIGURAÇÃO DO MACBOOK</h1>
+<p><em>Execute todos os passos no seu MacBook.</em></p>
+
+<h2>1. INSTALAR DOCKER CLI (APENAS CLIENTE)</h2>
+<div class="code-block">
+# Se tiver Homebrew:
+brew install docker docker-compose
+
+# Ou baixe os binários manualmente:
+# https://download.docker.com/mac/static/stable/
+</div>
+<p>Verifique:</p>
+<div class="code-block">
+docker --version
+docker-compose --version
+</div>
+
+<h2>2. CLONAR O REPOSITÓRIO</h2>
+<div class="code-block">
+cd ~
+git clone https://github.com/jrdosreis/reistech-deepseek.git
+cd reistech-deepseek
+</div>
+
+<h2>3. CONFIGURAR ACESSO REMOTO AO DOCKER DO WINDOWS</h2>
+<h3>3.1 Configurar variável de ambiente</h3>
+<div class="code-block">
+export DOCKER_HOST="tcp://192.168.100.232:2375"
+</div>
+<p>Para tornar permanente (zsh):</p>
+<div class="code-block">
+echo 'export DOCKER_HOST="tcp://192.168.100.232:2375"' >> ~/.zshrc
+source ~/.zshrc
+</div>
+<h3>3.2 Testar a conexão</h3>
+<div class="code-block">
+docker version
+</div>
+<p><strong>Saída esperada:</strong> Client (MacBook) e Server (Windows).</p>
+
+<h2>4. CRIAR ALIASES ÚTEIS (OPCIONAL, RECOMENDADO)</h2>
+<p>Adicione ao <code>~/.zshrc</code>:</p>
+<div class="code-block">
+# ============================================
+# ALIASES REISTECH
+# ============================================
+
+# Conectar/desconectar do Windows
+alias docker-win='export DOCKER_HOST="tcp://192.168.100.232:2375" && echo "Conectado ao Windows"'
+alias docker-local='unset DOCKER_HOST && echo "Usando Docker local (se instalado)"'
+
+# Comandos docker
+alias dps='docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
+alias dlogs='docker-compose logs -f'
+alias dup='docker-compose up -d'
+alias ddown='docker-compose down'
+alias drebuild='docker-compose up -d --build'
+
+# Git
+alias gs='git status'
+alias ga='git add .'
+alias gc='git commit -m'
+alias gp='git push'
+alias gl='git pull'
+</div>
+<p>Recarregue:</p>
+<div class="code-block">
+source ~/.zshrc
+</div>
+
+<h2>✅ CHECKLIST – MACBOOK PRONTO</h2>
+<ul>
+    <li>[ ] Docker CLI instalado</li>
+    <li>[ ] Repositório clonado</li>
+    <li>[ ] <code>DOCKER_HOST</code> configurado com IP <code>192.168.100.232</code></li>
+    <li>[ ] <code>docker version</code> retorna Client e Server</li>
+    <li>[ ] (Opcional) Aliases adicionados</li>
+</ul>
+
+<hr>
+
+<!-- ============================================ -->
+<!-- PARTE 3 – FLUXO DE TRABALHO COM GIT -->
+<!-- ============================================ -->
+<h1 style="border-bottom-color: #0077b6;">🔄 PARTE 3 – FLUXO DE TRABALHO COM GIT</h1>
+
+<h2>🎯 ESTRATÉGIA DE BRANCHES</h2>
+<table>
+    <tr><th>Branch</th><th>Finalidade</th></tr>
+    <tr><td><code>main</code></td><td>Código estável, pronto para testes</td></tr>
+    <tr><td><code>feature/*</code></td><td>Desenvolvimento de novas funcionalidades</td></tr>
+    <tr><td><code>bugfix/*</code></td><td>Correção de bugs</td></tr>
+</table>
+
+<h2>👨‍💻 NO MACBOOK (DESENVOLVIMENTO)</h2>
+<h3>1. Criar uma nova branch</h3>
+<div class="code-block">
+git checkout main
+git pull origin main
+git checkout -b feature/nome-da-funcionalidade
+</div>
+<h3>2. Desenvolver e testar</h3>
+<div class="code-block">
+code .   # Abrir VS Code
+# Edite os arquivos...
+</div>
+<h3>3. Commit e push</h3>
+<div class="code-block">
+git add .
+git commit -m "feat: descrição clara do que foi feito"
+git push origin feature/nome-da-funcionalidade
+</div>
+
+<h2>🖥️ NO WINDOWS (EXECUÇÃO E TESTE)</h2>
+<h3>1. Atualizar a branch desejada</h3>
+<div class="code-block">
+cd C:\reistech-deepseek
+git checkout feature/nome-da-funcionalidade
+git pull origin feature/nome-da-funcionalidade
+</div>
+<h3>2. Reconstruir e iniciar os containers</h3>
+<div class="code-block">
+docker-compose down
+docker-compose up -d --build
+</div>
+<h3>3. Acompanhar os logs (opcional)</h3>
+<div class="code-block">
+docker-compose logs -f
+</div>
+<h3>4. Testar no navegador do MacBook</h3>
+<ul>
+    <li>Frontend: <code>http://192.168.100.232</code></li>
+    <li>Backend: <code>http://192.168.100.232:3000</code></li>
+</ul>
+
+<h2>🔁 FINALIZAR A FEATURE E INTEGRAR NA MAIN</h2>
+<h3>No MacBook:</h3>
+<div class="code-block">
+git checkout main
+git pull origin main
+git merge feature/nome-da-funcionalidade
+git push origin main
+</div>
+<h3>No Windows:</h3>
+<div class="code-block">
+git checkout main
+git pull origin main
+docker-compose down
+docker-compose up -d --build
+</div>
+
+<h2>⚠️ RESOLUÇÃO DE CONFLITOS</h2>
+<ol>
+    <li>No MacBook: <code>git checkout main</code> e <code>git pull</code>.</li>
+    <li><code>git merge feature/nome-da-funcionalidade</code> → se houver conflitos, resolva no VS Code.</li>
+    <li><code>git add .</code> → <code>git commit -m "merge: resolve conflitos"</code> → <code>git push</code>.</li>
+    <li>No Windows: pull e rebuild.</li>
+</ol>
+
+<hr>
+
+<!-- ============================================ -->
+<!-- PARTE 4 – TESTES E VERIFICAÇÃO -->
+<!-- ============================================ -->
+<h1 style="border-bottom-color: #0077b6;">🧪 PARTE 4 – TESTES E VERIFICAÇÃO</h1>
+
+<h2>✅ VERIFICAR SE OS CONTAINERS ESTÃO RODANDO</h2>
+<div class="code-block">
+docker ps
+</div>
+<p>(No MacBook com DOCKER_HOST configurado, mostra os containers do Windows.)</p>
+
+<h2>✅ TESTAR ACESSO ÀS APLICAÇÕES</h2>
+<table>
+    <tr><th>Serviço</th><th>URL</th></tr>
+    <tr><td>Frontend</td><td><code>http://192.168.100.232</code></td></tr>
+    <tr><td>Backend</td><td><code>http://192.168.100.232:3000</code></td></tr>
+    <tr><td>API Health</td><td><code>http://192.168.100.232:3000/health</code></td></tr>
+    <tr><td>PostgreSQL</td><td><code>192.168.100.232:5432</code> (via cliente)</td></tr>
+    <tr><td>Redis</td><td><code>192.168.100.232:6379</code></td></tr>
+</table>
+
+<h2>✅ TESTAR ENVIO DE E-MAIL</h2>
+<p>Utilize uma rota de teste ou recuperação de senha. As credenciais SMTP da Hostinger já estão configuradas.</p>
+
+<hr>
+
+<!-- ============================================ -->
+<!-- PARTE 5 – SOLUÇÃO DE PROBLEMAS -->
+<!-- ============================================ -->
+<h1 style="border-bottom-color: #0077b6;">🆘 PARTE 5 – SOLUÇÃO DE PROBLEMAS COMUNS</h1>
+
+<h3>🔴 Docker no Windows não inicia</h3>
+<div class="code-block">
+wsl --set-default-version 2
+net stop com.docker.service
+net start com.docker.service
+</div>
+
+<h3>🔴 Porta 2375 não responde (Test-NetConnection falha)</h3>
+<ul>
+    <li>Verifique se a opção "Expose daemon on tcp://localhost:2375" está marcada.</li>
+    <li>Verifique as regras de firewall: <code>Get-NetFirewallRule -DisplayName "Docker Daemon TCP 2375"</code></li>
+    <li>Reconfigure o firewall (passo 3 da Parte 1).</li>
+</ul>
+
+<h3>🔴 MacBook não consegue conectar ao Docker do Windows</h3>
+<div class="code-block">
+ping 192.168.100.232
+telnet 192.168.100.232 2375
+</div>
+<ul>
+    <li>Ping precisa funcionar (mesma rede).</li>
+    <li>Se ping OK mas telnet falha: problema de firewall no Windows.</li>
+</ul>
+
+<h3>🔴 Containers não sobem ou caem logo após iniciar</h3>
+<div class="code-block">
+docker-compose logs --tail=50
+</div>
+
+<h3>🔴 Hot reload não funciona</h3>
+<p>Certifique-se de que os <strong>volumes</strong> estão montados corretamente no <code>docker-compose.yml</code> e que o código fonte está atualizado na pasta mapeada.</p>
+
+<hr>
+
+<!-- ============================================ -->
+<!-- PARTE 6 – BACKUP E SEGURANÇA -->
+<!-- ============================================ -->
+<h1 style="border-bottom-color: #0077b6;">📦 PARTE 6 – BACKUP E SEGURANÇA</h1>
+
+<h3>🔒 PROTEÇÃO DOS ARQUIVOS <code>.env</code></h3>
+<ul>
+    <li>✅ <code>.env</code> e <code>frontend/.env</code> estão no <code>.gitignore</code>.</li>
+    <li>❌ <strong>Nunca commite esses arquivos.</strong></li>
+</ul>
+
+<h3>💾 BACKUP DO CÓDIGO</h3>
+<div class="code-block">
+# No MacBook
+tar -czf ~/Desktop/reistech-backup-$(date +%Y%m%d).tar.gz ~/reistech-deepseek
+</div>
+
+<h3>💾 BACKUP DO BANCO DE DADOS</h3>
+<div class="code-block">
+# No MacBook (conectado ao Docker do Windows)
+docker exec reistech-postgres pg_dumpall -U reistechuser > ~/backup-$(date +%Y%m%d).sql
+</div>
+
+<hr>
+
+<!-- ============================================ -->
+<!-- CONCLUSÃO -->
+<!-- ============================================ -->
+<div style="background: #0a3e5c; color: white; padding: 30px; border-radius: 16px; text-align: center; margin-top: 40px;">
+    <h2 style="color: white; border-bottom: none; margin-top: 0;">✅ AMBIENTE 100% PRONTO PARA DESENVOLVIMENTO</h2>
+    <p style="font-size: 1.2em; margin-bottom: 0;">Windows como servidor Docker | MacBook como estação de trabalho</p>
+    <p style="font-size: 1.1em; margin-top: 10px;">IP: 192.168.100.232 | Repositório: jrdosreis/reistech-deepseek</p>
+    <p style="margin-top: 20px; font-size: 1.1em;">🚀 Agora é só codar!</p>
+</div>
+
+<div class="footer">
+    <p>Manual gerado em 11 de fevereiro de 2026 · Projeto Reistech-DeepSeek</p>
+    <p style="margin-top: 6px;">Qualquer dúvida, consulte o arquivo original ou abra uma issue no GitHub.</p>
+</div>
+
+</div> <!-- .container -->
+</body>
+</html>

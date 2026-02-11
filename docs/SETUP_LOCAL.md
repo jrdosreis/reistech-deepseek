@@ -72,7 +72,7 @@ Edite `.env` com suas configurações:
 ```env
 APP_NAME="Reistech"
 NODE_ENV=development
-PORT=3001
+PORT=3000
 
 # Database
 DB_HOST=localhost
@@ -124,8 +124,8 @@ cp .env.example .env
 Edite com suas URLs:
 
 ```env
-VITE_API_URL=http://localhost:3001
-VITE_WS_URL=ws://localhost:3001
+VITE_API_URL=http://localhost:3000
+VITE_WS_URL=ws://localhost:3000
 VITE_APP_NAME="Reistech"
 VITE_DEBUG=false
 ```
@@ -255,7 +255,7 @@ pm2 kill
 
 ```bash
 # 1. Backend respondendo
-curl http://localhost:3001/api/health
+curl http://localhost:3000/api/health
 
 # 2. Banco conectado
 psql -U reistechuser -d reistechdb -c "SELECT COUNT(*) FROM users;"
@@ -275,10 +275,10 @@ open http://localhost:5173
 
 | Serviço | Local | Descrição |
 |---------|-------|-----------|
-| Frontend | http://localhost:5173 | Painel administrativo |
-| Backend API | http://localhost:3001 | API REST |
-| Health Check | http://localhost:3001/api/health | Status da API |
-| WebSocket | ws://localhost:3001/ws | Real-time updates |
+| Frontend | http://localhost | Painel administrativo (porta 80) |
+| Backend API | http://localhost:3000 | API REST |
+| Health Check | http://localhost:3000/api/health | Status da API |
+| WebSocket | ws://localhost:3000/ws | Real-time updates |
 | PostgreSQL | localhost:5432 | Banco de dados |
 | Redis | localhost:6379 | Cache (opcional) |
 
@@ -299,19 +299,19 @@ ifconfig | grep "inet " | grep -v 127.0.0.1
 
 ```env
 # Em frontend/.env
-VITE_API_URL=http://192.168.100.232:3001
-VITE_WS_URL=ws://192.168.100.232:3001
+VITE_API_URL=http://192.168.100.232:3000
+VITE_WS_URL=ws://192.168.100.232:3000
 
 # Em backend/.env
-API_DOMAIN="http://192.168.100.232:3001"
-CORS_WHITELIST="http://localhost:5173,http://192.168.100.232:5173"
+API_DOMAIN="http://192.168.100.232:3000"
+CORS_WHITELIST="http://localhost,http://192.168.100.232"
 ```
 
 ### 3. Acessar do Windows
 
 ```
-Frontend: http://192.168.100.232:5173
-Backend:  http://192.168.100.232:3001
+Frontend: http://192.168.100.232
+Backend:  http://192.168.100.232:3000
 ```
 
 ---
@@ -330,11 +330,11 @@ sudo systemctl status postgresql
 brew services start postgresql@15
 ```
 
-### ❌ "Port 3001 already in use"
+### ❌ "Port 3000 already in use"
 
 ```bash
-# Encontrar processo usando porta 3001
-lsof -i :3001
+# Encontrar processo usando porta 3000
+lsof -i :3000
 
 # Matar processo
 kill -9 <PID>
@@ -378,11 +378,11 @@ REDIS_HOST=  # Deixar vazio
 
 ```bash
 # Verificar URLs em frontend/.env
-VITE_API_URL=http://localhost:3001
-VITE_WS_URL=ws://localhost:3001
+VITE_API_URL=http://localhost:3000
+VITE_WS_URL=ws://localhost:3000
 
 # Testar conexão
-curl http://localhost:3001/api/health
+curl http://localhost:3000/api/health
 
 # Verificar CORS
 # Backend logs devem mostrar requisição aceita

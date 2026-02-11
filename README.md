@@ -123,12 +123,12 @@ docker-compose exec backend npm run seed
 
 ## URLs padrão
 
-- Frontend: http://localhost:5173
-- Backend: http://localhost:3001
+- Frontend: http://localhost (porta 80)
+- Backend: http://localhost:3000
 
 Credenciais padrão:
-- Email: admin@reiscelulares.com.br
-- Senha: Admin123!
+- Email: contato@reiscelulares.com.br
+- Senha: admin@reiscelulares
 
 ## Principais endpoints
 
@@ -201,7 +201,7 @@ Credenciais padrão:
 
 - WhatsApp não conecta: valide QR Code, conexão do celular e sessão Web.
 - Banco falha: verifique credenciais e execute migrations novamente.
-- Painel não carrega: confirme API em http://localhost:3001.
+- Painel não carrega: confirme API em http://localhost:3000.
 
 ## Suporte
 

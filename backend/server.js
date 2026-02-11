@@ -4,7 +4,7 @@ const config = require('./src/config/env');
 const logger = require('./src/config/logger');
 const WebSocketServer = require('./src/websocket/WebSocketServer');
 
-const PORT = config.port || 3001;
+const PORT = config.port || 3000;
 
 const server = http.createServer(app);
 const wss = new WebSocketServer(server);

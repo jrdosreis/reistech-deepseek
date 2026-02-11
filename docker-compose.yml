@@ -4,86 +4,56 @@ services:
   postgres:
     image: postgres:15-alpine
     container_name: reistech-postgres
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: reistech
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - reistech-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
     container_name: reistech-redis
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - reistech-network
-    command: redis-server --appendonly yes
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    restart: unless-stopped
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: node:18-alpine
     container_name: reistech-backend
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    environment:
-      NODE_ENV: production
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: reistech
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      REDIS_URL: redis://redis:6379
+      - postgres
+      - redis
+    env_file:
+      - .env
     ports:
-      - "3001:3001"
+      - "${PORT}:${PORT}"
     volumes:
-      - ./backend:/app
-      - /app/node_modules
-      - ./backend/uploads:/app/uploads
-      - ./backend/logs:/app/logs
-      - ./backend/whatsapp-sessions:/app/whatsapp-sessions
-    networks:
-      - reistech-network
+      - ./backend:/usr/src/app
+      - ./backend/uploads:/usr/src/app/uploads
+      - ./backend/logs:/usr/src/app/logs
+      - ./backend/whatsapp-sessions:/usr/src/app/whatsapp-sessions
+    working_dir: /usr/src/app
+    command: sh -c "npm install && npm run dev"
     restart: unless-stopped
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: node:18-alpine
     container_name: reistech-frontend
     depends_on:
       - backend
     ports:
-      - "5173:5173"
-    networks:
-      - reistech-network
+      - "80:3000"
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+    command: sh -c "npm install && npm start"
     restart: unless-stopped
 
 volumes:
   postgres_data:
-  redis_data:
-
-networks:
-  reistech-network:
-    driver: bridge
