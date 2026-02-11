@@ -1,5 +1,11 @@
 # ReisTech DeepSeek
 
+[![CI/CD Pipeline](https://github.com/jrdosreis/reistech-deepseek/actions/workflows/ci-cd.yml/badge.svg?branch=main)](https://github.com/jrdosreis/reistech-deepseek/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-18+-61dafb.svg)](https://react.dev/)
+[![Code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io/)
+
 Sistema completo de atendimento automatizado via WhatsApp com motor FSM determinístico, suporte multi-nicho e painel administrativo em React.
 
 ## Visão geral
