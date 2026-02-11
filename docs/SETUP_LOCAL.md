@@ -1,468 +1,450 @@
-# 🚀 Setup Local - Reistech DeepSeek
+# 🚀 Setup Local - ReisTech DeepSeek
 
-Guia completo para configurar o ambiente de desenvolvimento localmente.
+> **Última atualização**: 11 de fevereiro de 2026  
+> Guia completo para configurar o ambiente de desenvolvimento localmente (macOS/Linux).
 
-## Tabela de Conteúdos
+## 📋 Índice
 
-1. [Pré-requisitos](#pré-requisitos)
-2. [Configuração de Ambiente](#configuração-de-ambiente)
-3. [Instalação](#instalação)
-4. [Execução](#execução)
-5. [Verificação](#verificação)
-6. [Troubleshooting](#troubleshooting)
+- [Pré-requisitos](#pré-requisitos)
+- [Instalação](#instalação)
+- [Configuração](#configuração)
+- [Execução](#execução)
+- [Testes](#testes)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
-## Pré-requisitos
+## 🎯 Pré-requisitos
 
 ### Software Obrigatório
 
-- **Node.js 18+**: [Download](https://nodejs.org/)
-  ```bash
-  node --version  # Verificar versão
-  npm --version   # npm 9+
-  ```
+| Software | Versão Mínima | Instalação macOS |
+|----------|---------------|------------------|
+| **Node.js** | 18+ | `brew install node@18` |
+| **PostgreSQL** | 15+ | `brew install postgresql@15` |
+| **Git** | 2.0+ | Já incluso no macOS |
 
-- **PostgreSQL 15+**: [Download](https://www.postgresql.org/)
-  ```bash
-  # macOS
-  brew install postgresql@15
-  brew services start postgresql@15
-  
-  # Ubuntu/Debian
-  sudo apt-get install postgresql postgresql-contrib
-  sudo systemctl start postgresql
-  
-  # Windows
-  # Baixar instalador do site oficial
-  ```
+### Software Recomendado
 
-### Software Opcional (Recomendado)
+| Software | Versão | Para quê? | Instalação |
+|----------|--------|-----------|------------|
+| **Redis** | 7+ | Cache e sessions | `brew install redis` |
+| **Docker Desktop** | Latest | Alternativa ao setup local | [Download](https://www.docker.com/products/docker-desktop/) |
 
-- **Redis 7+** (para cache e sessões)
-  ```bash
-  # macOS
-  brew install redis
-  brew services start redis
-  
-  # Ubuntu/Debian
-  sudo apt-get install redis-server
-  sudo systemctl start redis-server
-  
-  # Windows - WSL2 recomendado
-  ```
+### Verificar Instalações
 
-- **Docker Desktop** (alternativa ao setup local)
-  - [Download](https://www.docker.com/products/docker-desktop/)
+```bash
+node --version  # v18+ ou superior
+npm --version   # v9+ ou superior
+psql --version  # PostgreSQL 15+ ou superior
+redis-cli --version  # Redis 7+ (opcional)
+```
 
 ---
 
-## Configuração de Ambiente
+## 💾 Instalação
 
-### 1. Arquivo `.env` Raiz
-
-Na raiz do projeto:
+### 1. Clonar Repositório
 
 ```bash
-cp .env.template.md .env
+git clone https://github.com/jrdosreis/reistech-deepseek.git
+cd reistech-deepseek
 ```
 
-Edite `.env` com suas configurações:
+### 2. Configurar Banco de Dados
+
+```bash
+# Iniciar PostgreSQL
+brew services start postgresql@15
+
+# Criar usuário e banco
+psql postgres << EOF
+CREATE USER reistechuser WITH PASSWORD 'reistechpass';
+CREATE DATABASE reistechdb OWNER reistechuser;
+GRANT ALL PRIVILEGES ON DATABASE reistechdb TO reistechuser;
+\q
+EOF
+```
+
+### 3. Iniciar Redis (Opcional)
+
+```bash
+brew services start redis
+```
+
+---
+
+## ⚙️ Configuração
+
+### Estrutura de `.env` Files
+
+O projeto usa **3 arquivos** `.env` separados:
+
+1. **`.env`** (raiz) → Docker Compose
+2. **`backend/.env`** → Execução local do backend
+3. **`frontend/.env`** → Variáveis Vite
+
+### 1. Criar `.env` Raiz (Docker Compose)
+
+```bash
+cp .env.example .env
+```
+
+**Edite `.env`** com:
 
 ```env
-APP_NAME="Reistech"
+# Application
+APP_NAME="ReisTech"
 NODE_ENV=development
 PORT=3000
+API_PREFIX=/api
 
-# Database
+# Database (Docker usa 'postgres', local usa 'localhost')
+DB_HOST=postgres
+DB_PORT=5432
+DB_NAME=reistechdb
+DB_USER=reistechuser
+DB_PASSWORD=reistechpass
+
+# Redis (Docker usa 'redis', local usa 'localhost')
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PASSWORD=
+
+# JWT Secrets (gerar com: openssl rand -base64 64)
+JWT_SECRET=$(openssl rand -base64 64 | tr -d '\n')
+JWT_REFRESH_SECRET=$(openssl rand -base64 64 | tr -d '\n')
+JWT_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=30d
+
+# Admin
+ADMIN_EMAIL=contato@reiscelulares.com.br
+ADMIN_PASSWORD=admin@reiscelulares
+
+# SMTP (Hostinger)
+SMTP_HOST=smtp.hostinger.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=contato@reiscelulares.com.br
+SMTP_PASSWORD=SuaSenhaAqui
+
+# WhatsApp
+WHATSAPP_SESSION_PATH=./whatsapp-sessions
+WHATSAPP_PUPPETEER_ARGS=--no-sandbox,--disable-setuid-sandbox
+```
+
+### 2. Criar `backend/.env` (Local)
+
+```bash
+cd backend
+cp .env.example .env
+```
+
+**Edite `backend/.env`** (mesmas variáveis, mas `DB_HOST=localhost` e `REDIS_HOST=localhost`):
+
+```env
+# Application
+APP_NAME="ReisTech"
+NODE_ENV=development
+PORT=3000
+API_PREFIX=/api
+
+# Database (LOCALHOST para execução local)
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=reistechdb
 DB_USER=reistechuser
-DB_PASSWORD=sua_senha_segura
+DB_PASSWORD=reistechpass
 
-# Redis
+# Redis (LOCALHOST para execução local)
 REDIS_HOST=localhost
 REDIS_PORT=6379
 
-# JWT
-JWT_SECRET=sua_chave_secreta_aqui
-JWT_REFRESH_SECRET=sua_chave_refresh_aqui
+# JWT Secrets (MESMOS da raiz)
+JWT_SECRET=<copiar_da_raiz>
+JWT_REFRESH_SECRET=<copiar_da_raiz>
+JWT_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=30d
 
 # Admin
-ADMIN_EMAIL="admin@reiscelulares.com.br"
-ADMIN_PASSWORD="Admin123!"
+ADMIN_EMAIL=contato@reiscelulares.com.br
+ADMIN_PASSWORD=admin@reiscelulares
 
 # SMTP
 SMTP_HOST=smtp.hostinger.com
 SMTP_PORT=465
-SMTP_USER=seu_email@dominio.com
-SMTP_PASSWORD=sua_senha_smtp
+SMTP_SECURE=true
+SMTP_USER=contato@reiscelulares.com.br
+SMTP_PASSWORD=SuaSenhaAqui
 
-# Domínios
-API_DOMAIN="http://localhost:3001"
-WEB_DOMAIN="http://localhost:5173"
-CORS_WHITELIST="http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173"
+# WhatsApp
+WHATSAPP_SESSION_PATH=./whatsapp-sessions
+WHATSAPP_PUPPETEER_ARGS=--no-sandbox,--disable-setuid-sandbox
 ```
 
-### 2. Backend `.env`
-
-```bash
-cd backend
-cp ../.env.template.md .env
-```
-
-Configurações específicas do backend (banco, redis, whatsapp, etc.)
-
-### 3. Frontend `.env`
+### 3. Criar `frontend/.env`
 
 ```bash
 cd frontend
 cp .env.example .env
 ```
 
-Edite com suas URLs:
+**Edite `frontend/.env`**:
 
 ```env
-VITE_API_URL=http://localhost:3000
-VITE_WS_URL=ws://localhost:3000
-VITE_APP_NAME="Reistech"
-VITE_DEBUG=false
+# Local development
+VITE_API_URL=http://localhost:3000/api
+VITE_WS_URL=ws://localhost:3000/ws
+
+# Remote development (Docker no Windows)
+# VITE_API_URL=http://192.168.100.232:3000/api
+# VITE_WS_URL=ws://192.168.100.232:3000/ws
+```
+
+### 4. Gerar JWT Secrets
+
+```bash
+# JWT_SECRET
+openssl rand -base64 64 | tr -d '\n' | pbcopy
+# Cole no .env como JWT_SECRET
+
+# JWT_REFRESH_SECRET
+openssl rand -base64 64 | tr -d '\n' | pbcopy
+# Cole no .env como JWT_REFRESH_SECRET
 ```
 
 ---
 
-## Instalação
+## ▶️ Execução
 
-### Passo 1: Criar Banco de Dados
+### Opção 1: Execução Local (Sem Docker)
 
-```bash
-# Conectar ao PostgreSQL
-psql -U postgres
-
-# Dentro do PostgreSQL
-CREATE USER reistechuser WITH PASSWORD 'sua_senha_segura';
-CREATE DATABASE reistechdb OWNER reistechuser;
-
-# Conceder privilégios
-GRANT ALL PRIVILEGES ON DATABASE reistechdb TO reistechuser;
-\q  # Sair
-```
-
-Ou use scripts:
+#### Backend
 
 ```bash
-# macOS/Linux
-createdb -U postgres reistechdb
+cd backend
+
+# Instalar dependências
+npm install
+
+# Executar migrations
+npm run migrate up
+
+# Popular banco com seeds (idempotente)
+npm run seed
+
+# Iniciar servidor (dev mode)
+npm run dev
 ```
 
-### Passo 2: Instalar Dependências
+✅ Backend rodando em **http://localhost:3000**
+
+#### Frontend (novo terminal)
+
+```bash
+cd frontend
+
+# Instalar dependências
+npm install
+
+# Iniciar dev server
+npm run dev
+```
+
+✅ Frontend rodando em **http://localhost:5173**
+
+---
+
+### Opção 2: Execução com Docker Compose
+
+```bash
+# Subir containers
+docker-compose up -d
+
+# Executar migrations
+docker-compose exec backend npm run migrate up
+
+# Popular banco com seeds
+docker-compose exec backend npm run seed
+
+# Ver logs
+docker-compose logs -f
+```
+
+✅ Acesse:
+- **Frontend**: http://localhost (porta 80)
+- **Backend API**: http://localhost:3000/api
+
+---
+
+## 🧪 Testes
+
+### Backend
+
+```bash
+cd backend
+
+# Todos os testes
+npm test
+
+# Com cobertura
+npm run test:coverage
+
+# Watch mode
+npm run test:watch
+
+# Linting
+npm run lint
+
+# Formatação
+npm run format
+```
+
+### Frontend
+
+```bash
+cd frontend
+
+# Testes Jest
+npm test
+
+# Testes E2E (Cypress)
+npm run test:e2e
+
+# Linting
+npm run lint
+
+# Formatação
+npm run format
+```
+
+---
+
+## 🔍 Verificação
+
+### Health Check
 
 ```bash
 # Backend
-cd backend
-npm install
+curl http://localhost:3000/health
 
-# Frontend (em novo terminal)
-cd frontend
-npm install
+# Resposta esperada:
+# {"status":"ok","timestamp":"..."}
 ```
 
-### Passo 3: Executar Migrações
+### Login Padrão
+
+- **URL**: http://localhost:5173
+- **Email**: contato@reiscelulares.com.br
+- **Senha**: admin@reiscelulares
+
+### Testar API
 
 ```bash
-cd backend
-npm run migrate up
-```
+# Login
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"contato@reiscelulares.com.br","password":"admin@reiscelulares"}'
 
-Isso cria as tabelas no banco:
-
-```
-✓ Migrations applied successfully
-  - users
-  - workspaces
-  - catalogo
-  - textos_cms
-  - conversas
-  - fila_humana
-  - ...
-```
-
-### Passo 4: Semear Dados Iniciais
-
-```bash
-cd backend
-npm run seed
-```
-
-Isso insere:
-
-- Usuário admin: `admin@reiscelulares.com.br` / `Admin123!`
-- 3 workspaces padrão: iphone_store, law_firm, motorcycle_shop
-- Textos de CMS pré-configurados
-- Roles e permissões
-
----
-
-## Execução
-
-### Modo 1: Terminal Local (Sem Docker)
-
-```bash
-# Terminal 1 - Backend
-cd backend
-npm run dev
-# Saída: Server running on http://localhost:3001
-
-# Terminal 2 - Frontend
-cd frontend
-npm run dev
-# Saída: Local: http://localhost:5173
-```
-
-### Modo 2: Docker Compose
-
-```bash
-# Na raiz do projeto
-docker-compose up -d
-
-# Logs
-docker-compose logs -f
-
-# Parar
-docker-compose down
-```
-
-### Modo 3: Produção Local (PM2)
-
-```bash
-cd backend
-npm install -g pm2
-npm run build
-
-pm2 start ecosystem.config.js
-pm2 logs
-
-# Parar
-pm2 kill
+# Status WhatsApp
+curl http://localhost:3000/api/whatsapp/status
 ```
 
 ---
 
-## Verificação
+## 🛠️ Troubleshooting
 
-### ✅ Checklist de Funcionamento
-
-```bash
-# 1. Backend respondendo
-curl http://localhost:3000/api/health
-
-# 2. Banco conectado
-psql -U reistechuser -d reistechdb -c "SELECT COUNT(*) FROM users;"
-
-# 3. Redis funcionando (se ativado)
-redis-cli ping
-# Resposta esperada: PONG
-
-# 4. Frontend carregando
-open http://localhost:5173
-
-# 5. Login funcionando
-# Use: admin@reiscelulares.com.br / Admin123!
-```
-
-### 📊 URLs Padrão
-
-| Serviço | Local | Descrição |
-|---------|-------|-----------|
-| Frontend | http://localhost | Painel administrativo (porta 80) |
-| Backend API | http://localhost:3000 | API REST |
-| Health Check | http://localhost:3000/api/health | Status da API |
-| WebSocket | ws://localhost:3000/ws | Real-time updates |
-| PostgreSQL | localhost:5432 | Banco de dados |
-| Redis | localhost:6379 | Cache (opcional) |
-
----
-
-## Acesso via IP Windows
-
-Se acessar de outra máquina Windows na rede:
-
-### 1. Descobrir IP do Mac
-
-```bash
-ifconfig | grep "inet " | grep -v 127.0.0.1
-# Exemplo de saída: inet 192.168.100.232
-```
-
-### 2. Atualizar `.env`
-
-```env
-# Em frontend/.env
-VITE_API_URL=http://192.168.100.232:3000
-VITE_WS_URL=ws://192.168.100.232:3000
-
-# Em backend/.env
-API_DOMAIN="http://192.168.100.232:3000"
-CORS_WHITELIST="http://localhost,http://192.168.100.232"
-```
-
-### 3. Acessar do Windows
-
-```
-Frontend: http://192.168.100.232
-Backend:  http://192.168.100.232:3000
-```
-
----
-
-## Troubleshooting
-
-### ❌ "Connection refused" (Banco)
+### Erro: "Database connection failed"
 
 ```bash
 # Verificar se PostgreSQL está rodando
 brew services list | grep postgresql
-# ou
-sudo systemctl status postgresql
 
-# Iniciar se necessário
+# Se não estiver, iniciar
 brew services start postgresql@15
+
+# Testar conexão
+psql -U reistechuser -d reistechdb -h localhost
 ```
 
-### ❌ "Port 3000 already in use"
+### Erro: "Redis connection failed"
 
 ```bash
-# Encontrar processo usando porta 3000
+# Iniciar Redis
+brew services start redis
+
+# Testar conexão
+redis-cli ping
+# Resposta esperada: PONG
+```
+
+### Erro: "WhatsApp não conecta"
+
+1. Acesse http://localhost:5173 e vá para "WhatsApp"
+2. Escaneie o QR Code com seu celular
+3. Aguarde confirmação da conexão
+
+### Porta em uso
+
+```bash
+# Ver o que está usando a porta 3000
 lsof -i :3000
 
 # Matar processo
 kill -9 <PID>
-
-# Ou usar porta diferente
-PORT=3002 npm run dev
 ```
 
-### ❌ "Cannot find module"
+### Limpar e reinstalar
 
 ```bash
-# Limpar cache e reinstalar
+# Backend
+cd backend
+rm -rf node_modules package-lock.json
+npm install
+
+# Frontend
+cd frontend
 rm -rf node_modules package-lock.json
 npm install
 ```
 
-### ❌ "Migrations failed"
+### Reset completo do banco
 
 ```bash
-# Ver status das migrations
 cd backend
-npm run migrate status
 
-# Reverter última migration
+# Desfazer todas as migrations
 npm run migrate down
 
-# Reaplicar
+# Aplicar novamente
 npm run migrate up
-```
 
-### ❌ "Redis connection refused"
-
-Redis é opcional. Se não precisar:
-
-```bash
-# Em backend/.env
-REDIS_HOST=  # Deixar vazio
-```
-
-### ❌ "Frontend não conecta ao backend"
-
-```bash
-# Verificar URLs em frontend/.env
-VITE_API_URL=http://localhost:3000
-VITE_WS_URL=ws://localhost:3000
-
-# Testar conexão
-curl http://localhost:3000/api/health
-
-# Verificar CORS
-# Backend logs devem mostrar requisição aceita
-```
-
-### ❌ "SMTP authentication failed"
-
-```bash
-# Verificar credenciais em .env
-SMTP_HOST=smtp.hostinger.com
-SMTP_PORT=465
-SMTP_USER=seu_email@dominio.com
-SMTP_PASSWORD=sua_senha_real
-
-# Teste com telnet
-telnet smtp.hostinger.com 465
+# Popular dados
+npm run seed
 ```
 
 ---
 
-## Scripts Úteis
+## 📚 Próximos Passos
 
-```bash
-# Backend
-npm run dev         # Desenvolvimento com nodemon
-npm run build       # Build para produção
-npm test            # Rodar testes
-npm run lint        # Verificar estilo de código
-npm run format      # Formatar código
-npm run migrate     # Executar migrations
-
-# Frontend
-npm run dev         # Desenvolvimento com Vite
-npm run build       # Build para produção
-npm run test        # Rodar testes
-npm run test:e2e    # E2E tests com Cypress
-npm run lint        # Verificar estilo
-npm run format      # Formatar código
-
-# Docker
-docker-compose up -d          # Iniciar
-docker-compose down           # Parar
-docker-compose logs -f        # Ver logs
-docker-compose exec backend npm run migrate up  # Migrations
-```
+- ✅ Configurar WhatsApp (escanear QR Code)
+- ✅ Importar catálogo CSV
+- ✅ Personalizar textos do bot (CMS)
+- ✅ Testar fila humana
+- 📖 Ler [MANUAL-OFICIAL.html](../MANUAL-OFICIAL.html) para setup remoto
 
 ---
 
-## Próximas Etapas
+## 🔗 Links Úteis
 
-Depois de configurar o ambiente:
-
-1. **Explorar o painel**
-   - http://localhost:5173
-   - Fazer login com admin
-   - Conferir workspaces
-
-2. **Testar WhatsApp**
-   - Acessar aba "WhatsApp"
-   - Escanear QR Code com seu número
-   - Enviar mensagens para testar
-
-3. **Configurar Catálogo**
-   - Importar CSV de produtos
-   - Testar busca e respostas automáticas
-
-4. **Personalizar CMS**
-   - Editar textos do bot
-   - Testar recarregamento em tempo real
-
-5. **Consultar Documentação**
-   - [docs/](.) para guias detalhados
-   - [docs/reistech_especificacao_tecnica.md](reistech_especificacao_tecnica.md) para arquitetura
-   - [docs/api_endpoints_documentacao.yaml](api_endpoints_documentacao.yaml) para endpoints
+- [README Principal](../README.md)
+- [Estrutura do Projeto](ESTRUTURA.md)
+- [Manual Oficial](../MANUAL-OFICIAL.html)
+- [Guia de Migração](MIGRATION_GUIDE.md)
+- [Otimização para Produção](OTIMIZACAO_PRODUCAO.md)
 
 ---
 
-## Suporte
-
-- 📧 Issues: [GitHub Issues](https://github.com/jrdosreis/reistech-deepseek/issues)
-- 📖 Documentação: [docs/](.)
-- 🐛 Logs: Verificar `backend/logs/`
+**Atualizado em**: 11 de fevereiro de 2026  
+**Versão**: 1.1
 
