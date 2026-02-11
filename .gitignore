@@ -2,7 +2,9 @@
 .env.local
 .env.prod
 .env.production
+frontend/.env
 logs/
+*.log
 node_modules/
 
 # Backups
