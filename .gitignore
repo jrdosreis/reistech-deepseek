@@ -32,3 +32,4 @@ cypress/screenshots/
 
 # WhatsApp sessions (opcional - comente se quiser versioná-las)
 # backend/whatsapp-sessions/
+backend/whatsapp-sessions/
