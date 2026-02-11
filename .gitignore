@@ -1,16 +1,37 @@
+# ============================================================================
+# REISTECH-DEEPSEEK - GITIGNORE
+# ============================================================================
+
+# Environment files (NUNCA commitar credenciais!)
 .env
 .env.local
 .env.prod
 .env.production
+.env.*
+!.env.example
+!.env.*.example
+backend/.env
+backend/.env.local
+backend/.env.production
+backend/.env.bak
 frontend/.env
+frontend/.env.local
+frontend/.env.production
+
+# Logs
 logs/
 *.log
+*.log.*
+
+# Dependencies
 node_modules/
+package-lock.json
 
 # Backups
 *.backup-*
 *.bak
 *.old
+backups/
 
 # Build outputs
 dist/
@@ -32,6 +53,9 @@ Thumbs.db
 cypress/videos/
 cypress/screenshots/
 
-# WhatsApp sessions (opcional - comente se quiser versioná-las)
-# backend/whatsapp-sessions/
+# WhatsApp sessions
 backend/whatsapp-sessions/
+
+# Uploads (opcional - comente se quiser versionar)
+backend/uploads/
+uploads/
