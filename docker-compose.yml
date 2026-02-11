@@ -32,7 +32,7 @@ services:
     env_file:
       - .env
     ports:
-      - "${PORT}:${PORT}"
+      - "3000:3000"
     volumes:
       - ./backend:/usr/src/app
       - ./backend/uploads:/usr/src/app/uploads
@@ -47,12 +47,14 @@ services:
     container_name: reistech-frontend
     depends_on:
       - backend
+    env_file:
+      - ./frontend/.env
     ports:
-      - "80:3000"
+      - "80:5173"
     volumes:
       - ./frontend:/app
     working_dir: /app
-    command: sh -c "npm install && npm start"
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     restart: unless-stopped
 
 volumes:
