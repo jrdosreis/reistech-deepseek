@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const WorkspaceController = require('../modules/workspaces/WorkspaceController');
+const { audit } = require('../core/middleware/audit');
 
 // GET /api/workspaces - Listar todos os workspaces
 router.get('/', WorkspaceController.getAll);
@@ -12,15 +13,15 @@ router.get('/packs', WorkspaceController.getPacks);
 router.get('/:id', WorkspaceController.getById);
 
 // POST /api/workspaces - Criar novo workspace
-router.post('/', WorkspaceController.create);
+router.post('/', audit('CREATE_WORKSPACE', 'Workspace'), WorkspaceController.create);
 
 // PUT /api/workspaces/:id - Atualizar workspace
-router.put('/:id', WorkspaceController.update);
+router.put('/:id', audit('UPDATE_WORKSPACE', 'Workspace'), WorkspaceController.update);
 
 // DELETE /api/workspaces/:id - Deletar workspace
-router.delete('/:id', WorkspaceController.delete);
+router.delete('/:id', audit('DELETE_WORKSPACE', 'Workspace'), WorkspaceController.delete);
 
 // POST /api/workspaces/:workspaceId/reload-rules - Recarregar regras do workspace
-router.post('/:workspaceId/reload-rules', WorkspaceController.reloadRules);
+router.post('/:workspaceId/reload-rules', audit('RELOAD_RULES', 'Workspace'), WorkspaceController.reloadRules);
 
 module.exports = router;
