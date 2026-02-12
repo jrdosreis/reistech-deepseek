@@ -30,6 +30,7 @@ const FilaHumana = require('./FilaHumana')(sequelize, Sequelize);
 const TextoCms = require('./TextoCms')(sequelize, Sequelize);
 const CatalogoItem = require('./CatalogoItem')(sequelize, Sequelize);
 const AuditLog = require('./AuditLog')(sequelize, Sequelize);
+const Notification = require('./Notification')(sequelize, Sequelize);
 
 // Definir relacionamentos
 Workspace.hasMany(User, { foreignKey: 'workspace_id', as: 'users' });
@@ -63,6 +64,11 @@ Workspace.hasMany(AuditLog, { foreignKey: 'workspace_id', as: 'auditLogs' });
 AuditLog.belongsTo(Workspace, { foreignKey: 'workspace_id', as: 'workspace' });
 AuditLog.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
+Workspace.hasMany(Notification, { foreignKey: 'workspace_id', as: 'notifications' });
+Notification.belongsTo(Workspace, { foreignKey: 'workspace_id', as: 'workspace' });
+User.hasMany(Notification, { foreignKey: 'user_id', as: 'notifications' });
+Notification.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
 // Função para inicializar o banco de dados
 async function initializeDatabase() {
   try {
@@ -94,5 +100,6 @@ module.exports = {
   TextoCms,
   CatalogoItem,
   AuditLog,
+  Notification,
   initializeDatabase,
 };
