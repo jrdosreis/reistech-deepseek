@@ -83,6 +83,117 @@ O projeto recebeu atualizações estruturais focadas em segurança, performance 
 - **WebSocket**: atualizações em tempo real
 - **Redis**: opcional (sessão/rate limiting)
 
+### Visão Geral (Mermaid)
+
+```mermaid
+graph TB
+  subgraph CLIENTE["🟢 Cliente WhatsApp"]
+    MSG[Mensagem Recebida] --> QR[QR Code Scan] --> CONN[Conexão Estabelecida]
+  end
+
+  CLIENTE --> WHATSAPP_LAYER
+
+  subgraph BACKEND["⚙️ Backend Layer"]
+    subgraph WHATSAPP_LAYER["WhatsApp-Web.js Integration"]
+      SESS[Sessões Manager]
+      MSGP[Mensagens Processor]
+    end
+
+    WHATSAPP_LAYER --> FSM
+
+    subgraph FSM["🤖 ReisTech Engine – FSM"]
+      PARSER[Parser de Intenção] --> SM[State Machine] --> ROUTER[Decision Router]
+      SM --> RESP[Resposta Generator]
+      ROUTER --> FILA_MGR[Fila Manager]
+    end
+
+    FSM --> GATEWAY
+
+    subgraph GATEWAY["🔒 API Gateway"]
+      AUTH_MW[Auth Middleware]
+      RATE[Rate Limiter]
+      AUDIT[Audit Middleware]
+    end
+
+    GATEWAY --> SERVICES
+
+    subgraph SERVICES["📦 Services"]
+      FILA_SVC[Fila Service]
+      CONV_SVC[Conversas Service]
+      CAT_SVC[Catálogo Service]
+      CMS_SVC[CMS Service]
+      WS_SVC[Workspace Service]
+    end
+  end
+
+  SERVICES --> PG
+  SERVICES --> REDIS
+  SERVICES --> WS_SERVER
+
+  subgraph INFRA["🗄️ Infraestrutura"]
+    PG["PostgreSQL"]
+    REDIS["Redis (Cache · Pub/Sub)"]
+    WS_SERVER["WebSocket Server"]
+  end
+
+  WS_SERVER --> FRONTEND
+
+  subgraph FRONTEND["🖥️ Frontend – React + Redux"]
+    PAGES["Dashboard · Fila · Conversas · Catálogo · CMS · WhatsApp"]
+  end
+```
+
+### Fluxo FSM
+
+```mermaid
+sequenceDiagram
+    participant C as Cliente WhatsApp
+    participant WA as WhatsApp-Web.js
+    participant RT as ReisTech Engine
+    participant SM as StateMachine
+    participant R as Router
+    participant DB as DossierBuilder
+    participant PG as PostgreSQL
+
+    C->>WA: Envia mensagem
+    WA->>RT: processMessage()
+    RT->>SM: transition(estado_atual, mensagem)
+    SM->>R: determineIntent(mensagem)
+    R-->>SM: intent + novo_estado
+    SM->>DB: updateDossier(cliente, dados)
+    DB->>PG: Persiste estado + dossiê
+    SM-->>RT: resposta gerada
+    RT->>WA: Envia resposta
+    WA->>C: Mensagem entregue
+
+    alt Escalação para humano
+        RT->>PG: Cria entrada na fila_humana
+        RT->>WA: Mensagem de transferência
+    end
+```
+
+> Diagramas completos com deploy: [`docs/diagrama_arquitetura_sistema.md`](docs/diagrama_arquitetura_sistema.md)
+
+---
+
+## 🔐 Segurança
+
+### Autenticação e Autorização
+- **JWT** com access token (15 min) + refresh token (30 dias)
+- **RBAC** (Role-Based Access Control) com roles e permissões granulares
+- **Token Blacklist** via Redis para invalidação imediata em logout/revogação
+
+### Proteções em Produção
+- **Helmet** — Headers HTTP seguros (CSP, HSTS, X-Frame-Options, etc.)
+- **Rate Limiting** — 300 req/15min por IP em produção
+- **CORS** — Origem restrita via variável de ambiente
+- **Non-root execution** — Containers e PM2 rodam com usuário dedicado
+- **Secrets** — Permissão `600` para `.env` em produção
+
+### Auditoria
+- **Audit Middleware** — Registra operações sensíveis (criação, atualização, deleção) com usuário, IP, timestamp e payload
+- **Logs estruturados** — Winston com rotação diária e formatação JSON
+
 ---
 
 ## ⚙️ Requisitos
@@ -462,9 +573,6 @@ docker-compose up -d --build
 │   ├── verificar-tudo.sh      # Verificação completa
 │   └── PREPARE_FOR_WINDOWS.sh # Preparação para Windows
 │
-├── postgres/
-│   └── init.sql               # Inicialização PostgreSQL
-│
 └── .vscode/                   # Configurações VS Code
     ├── launch.json
     ├── settings.json
@@ -491,6 +599,6 @@ Este projeto é proprietário. Copyright © 2024-2026 ReisTech. Todos os direito
 - [Manual Oficial](docs/manuals/MANUAL-OFICIAL.html) – Setup Windows + MacBook
 - [API Documentation](docs/api_endpoints_documentacao.yaml)
 - [Database Schema](docs/estrutura_banco_dados.sql)
-- [Architecture Diagram](docs/diagrama_arquitetura_sistema.txt)
+- [Architecture Diagrams (Mermaid)](docs/diagrama_arquitetura_sistema.md)
 
 ---
