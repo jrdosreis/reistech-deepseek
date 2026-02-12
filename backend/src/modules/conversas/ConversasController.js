@@ -4,8 +4,12 @@ const ConversasService = require('./ConversasService');
 class ConversasController {
   async list(req, res, next) {
     try {
-      const telefone = req.query.telefone;
-      const data = await ConversasService.listConversas(req.workspace.id, telefone);
+      const { telefone, page = 1, limit = 20 } = req.query;
+      const parsedPage = Math.max(1, parseInt(page, 10) || 1);
+      const parsedLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+      const offset = (parsedPage - 1) * parsedLimit;
+
+      const data = await ConversasService.listConversas(req.workspace.id, telefone, offset, parsedLimit);
       res.json(responseSuccess(data));
     } catch (error) {
       next(error);
@@ -60,9 +64,6 @@ class ConversasController {
 
       res.json(responseSuccess(data));
     } catch (error) {
-      if (error.code === 'CLIENTE_NOT_FOUND') {
-        return res.status(404).json(responseError(error.message, error.code));
-      }
       next(error);
     }
   }
