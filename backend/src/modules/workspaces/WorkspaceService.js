@@ -1,6 +1,7 @@
 const { Workspace } = require('../../db/models');
 const VerticalPackLoader = require('../../workspaces/VerticalPackLoader');
 const logger = require('../../config/logger');
+const { AppError } = require('../../core/errors/AppError');
 
 class WorkspaceService {
   constructor() {
@@ -22,7 +23,7 @@ class WorkspaceService {
     try {
       const workspace = await Workspace.findByPk(id);
       if (!workspace) {
-        throw new Error('Workspace não encontrado');
+        throw new AppError('Workspace não encontrado', 'WORKSPACE_NOT_FOUND', 404);
       }
       return workspace;
     } catch (error) {
@@ -38,7 +39,7 @@ class WorkspaceService {
       // Validar se o pack existe
       const pack = this.packLoader.getPack(pack_key);
       if (!pack) {
-        throw new Error(`Pack não encontrado: ${pack_key}`);
+        throw new AppError(`Pack não encontrado: ${pack_key}`, 'PACK_NOT_FOUND', 404);
       }
 
       // Criar workspace
@@ -67,7 +68,7 @@ class WorkspaceService {
       if (pack_key && pack_key !== workspace.pack_key) {
         const pack = this.packLoader.getPack(pack_key);
         if (!pack) {
-          throw new Error(`Pack não encontrado: ${pack_key}`);
+          throw new AppError(`Pack não encontrado: ${pack_key}`, 'PACK_NOT_FOUND', 404);
         }
       }
 

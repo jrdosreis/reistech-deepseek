@@ -3,6 +3,7 @@ const path = require('path');
 const Redis = require('ioredis');
 const logger = require('../../config/logger');
 const db = require('../../db/models');
+const { AppError } = require('../errors/AppError');
 
 class DossierBuilder {
   // Cache estático para compartilhar regras entre instâncias da classe
@@ -116,7 +117,7 @@ class DossierBuilder {
       });
 
       if (!estado) {
-        throw new Error('Estado do cliente não encontrado');
+        throw new AppError('Estado do cliente não encontrado', 'CLIENTE_ESTADO_NOT_FOUND', 404);
       }
 
       // Atualizar contexto com novos dados

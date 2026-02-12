@@ -5,6 +5,7 @@ const logger = require('../../config/logger');
 const config = require('../../config/env');
 const db = require('../../db/models');
 const ReisTechEngine = require('../../core/engine/ReisTech');
+const { AppError } = require('../../core/errors/AppError');
 
 class WhatsAppService {
   constructor() {
@@ -218,11 +219,11 @@ class WhatsAppService {
 
   async sendMessage(to, content) {
     if (!this.client || this.status !== 'connected') {
-      throw new Error('WhatsApp não conectado');
+      throw new AppError('WhatsApp não conectado', 'WHATSAPP_NOT_CONNECTED', 503);
     }
 
     if (!this.canSendTo(to)) {
-      throw new Error('Envio bloqueado: cliente não iniciou conversa');
+      throw new AppError('Envio bloqueado: cliente não iniciou conversa', 'SEND_BLOCKED_NO_INBOUND', 403);
     }
 
     try {
@@ -270,58 +271,46 @@ class WhatsAppService {
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
 
-    const replacements = { workspaceId, startOfDay };
+    const dateFilter = {
+      workspace_id: workspaceId,
+      created_at: { [db.Sequelize.Op.gte]: startOfDay },
+    };
 
-    const [{ total_mensagens }] = await db.sequelize.query(
-      `
-        SELECT COUNT(*)::int AS total_mensagens
-        FROM conversas_interacoes
-        WHERE workspace_id = :workspaceId
-          AND created_at >= :startOfDay
-      `,
-      { replacements, type: db.Sequelize.QueryTypes.SELECT }
-    );
+    const [totalMensagens, clientesAtivos, conversasAbertas, directionCounts] = await Promise.all([
+      db.ConversaInteracao.count({ where: dateFilter }),
 
-    const [{ clientes_ativos }] = await db.sequelize.query(
-      `
-        SELECT COUNT(DISTINCT cliente_id)::int AS clientes_ativos
-        FROM conversas_interacoes
-        WHERE workspace_id = :workspaceId
-          AND created_at >= :startOfDay
-      `,
-      { replacements, type: db.Sequelize.QueryTypes.SELECT }
-    );
+      db.ConversaInteracao.count({
+        where: dateFilter,
+        distinct: true,
+        col: 'cliente_id',
+      }),
 
-    const [{ conversas_abertas }] = await db.sequelize.query(
-      `
-        SELECT COUNT(*)::int AS conversas_abertas
-        FROM fila_humana
-        WHERE workspace_id = :workspaceId
-          AND status IN ('waiting', 'locked')
-      `,
-      { replacements, type: db.Sequelize.QueryTypes.SELECT }
-    );
+      db.FilaHumana.count({
+        where: {
+          workspace_id: workspaceId,
+          status: ['waiting', 'locked'],
+        },
+      }),
 
-    const [{ outbound, inbound }] = await db.sequelize.query(
-      `
-        SELECT
-          SUM(CASE WHEN direction = 'outbound' THEN 1 ELSE 0 END)::int AS outbound,
-          SUM(CASE WHEN direction = 'inbound' THEN 1 ELSE 0 END)::int AS inbound
-        FROM conversas_interacoes
-        WHERE workspace_id = :workspaceId
-          AND created_at >= :startOfDay
-      `,
-      { replacements, type: db.Sequelize.QueryTypes.SELECT }
-    );
+      db.ConversaInteracao.findAll({
+        where: dateFilter,
+        attributes: [
+          'direction',
+          [db.sequelize.fn('COUNT', db.sequelize.col('id')), 'count'],
+        ],
+        group: ['direction'],
+        raw: true,
+      }),
+    ]);
 
-    const inboundCount = inbound || 0;
-    const outboundCount = outbound || 0;
-    const taxaResposta = inboundCount > 0 ? Math.round((outboundCount / inboundCount) * 100) : 0;
+    const inbound = Number(directionCounts.find(d => d.direction === 'inbound')?.count || 0);
+    const outbound = Number(directionCounts.find(d => d.direction === 'outbound')?.count || 0);
+    const taxaResposta = inbound > 0 ? Math.round((outbound / inbound) * 100) : 0;
 
     return {
-      totalMensagens: total_mensagens || 0,
-      clientesAtivos: clientes_ativos || 0,
-      conversasAbertas: conversas_abertas || 0,
+      totalMensagens,
+      clientesAtivos,
+      conversasAbertas,
       taxaResposta,
     };
   }

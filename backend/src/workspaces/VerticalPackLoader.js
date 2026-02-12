@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const logger = require('../config/logger');
+const { AppError } = require('../core/errors/AppError');
 
 class VerticalPackLoader {
   constructor() {
@@ -49,7 +50,7 @@ class VerticalPackLoader {
     const packPath = path.join(this.packsDir, `${key}.json`);
     
     if (!fs.existsSync(packPath)) {
-      throw new Error(`Pack não encontrado: ${key}`);
+      throw new AppError(`Pack não encontrado: ${key}`, 'PACK_NOT_FOUND', 404);
     }
 
     return JSON.parse(fs.readFileSync(packPath, 'utf8'));
@@ -60,12 +61,12 @@ class VerticalPackLoader {
     
     for (const field of requiredFields) {
       if (!packData[field]) {
-        throw new Error(`Campo obrigatório faltando no pack: ${field}`);
+        throw new AppError(`Campo obrigatório faltando no pack: ${field}`, 'PACK_VALIDATION_ERROR', 422);
       }
     }
 
     if (!Array.isArray(packData.textos_cms)) {
-      throw new Error('textos_cms deve ser um array');
+      throw new AppError('textos_cms deve ser um array', 'PACK_VALIDATION_ERROR', 422);
     }
 
     return true;
