@@ -9,6 +9,7 @@
     "test": "jest --config jest.config.js",
     "test:coverage": "jest --config jest.config.js --coverage",
     "test:watch": "jest --config jest.config.js --watch",
+    "test:integration": "jest --config jest.config.js --testPathPattern=integration",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "format": "prettier --write src/**/*.js",
