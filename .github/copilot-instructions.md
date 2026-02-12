@@ -1,159 +1,151 @@
 # Copilot Instructions for AI Agents
 
 ## Quick reference
-- **Tech stack**: Node.js/Express backend + React/Vite/MUI frontend + PostgreSQL + Redis (optional) + whatsapp-web.js
-- **Development approach**: Monorepo with containerized dev/prod environments; local setup also supported
-- **Key concept**: FSM-driven WhatsApp automation with multi-tenant workspace isolation and hot-reloadable business rules
+- **Stack**: Node 18 / Express backend · React 18 / Vite / MUI frontend · PostgreSQL 15 · Redis 7 (optional) · whatsapp-web.js
+- **Concept**: FSM-driven WhatsApp automation with multi-tenant workspace isolation and hot-reloadable business rules
+- **Language**: Codebase mixes English (code) and Portuguese (UI, tests, CMS keys, comments). Test descriptions and user-facing strings are in pt-BR.
+- **Remote Docker host**: Development supports a Windows machine as Docker daemon on the local network, configured via `DOCKER_HOST` env var. See `docs/DOCKER_REMOTE_MAC_WINDOWS.md`.
 
-## Setup documentation
-- **Official manual**: See `docs/manuals/MANUAL-OFICIAL.html` for complete Docker + remote development setup (Windows Docker host + MacBook development)
-- **Local setup guide**: `docs/SETUP_LOCAL.md` for non-Docker development
-- **Environment**: Windows at 192.168.100.232 (Docker host), MacBook (development station)
-- **Credentials**: All `.env` files with validated credentials documented in manual (DB, SMTP, JWT, admin access)
-- **Three `.env` files**: Root (Docker Compose), `backend/.env` (local backend), `frontend/.env` (Vite vars)
+| Component | Key path |
+|---|---|
+| Entry point (HTTP) | `backend/server.js` |
+| Express app | `backend/app.js` |
+| FSM engine | `backend/src/core/engine/ReisTech.js` |
+| WebSocket server | `backend/src/websocket/WebSocketServer.js` |
+| React entry | `frontend/src/main.jsx` |
+| API client | `frontend/src/services/api.js` |
+| Route aggregator | `backend/src/routes/index.js` |
 
-## Big picture
-- **Monorepo**: Backend Node.js/Express + frontend React/Vite + MUI; containerized via `docker-compose.yml` (production: `docker-compose.prod.yml`)
-- **Backend app**: Express app in `backend/app.js`, HTTP server in `backend/server.js`; routes under `backend/src/routes/` and domain modules under `backend/src/modules/` behind `/api` prefix
-- **FSM engine**: Deterministic engine in `backend/src/core/engine/` (classes: `ReisTech.js`, `StateMachine.js`, `Router.js`, `DossierBuilder.js`) manages WhatsApp conversation flow; workspace packs in `backend/src/workspaces/packs/` (JSON files) define vertical-specific behavior
-- **Real-time**: WebSocket server in `backend/src/websocket/WebSocketServer.js` with React hook at `frontend/src/contexts/hooks/useWebSocket.js`
-- **Data layer**: Migrations in `backend/src/db/migrations/`, Sequelize models in `backend/src/db/models/`, seeds in `backend/src/db/seeds/`
-- **Multi-tenant**: Each workspace has isolated configuration (pack), CMS texts, catalog, and client state; workspace ID used throughout system for data isolation
+## Architecture overview
 
-## Critical workflows
-
-### Local setup (without Docker)
-```bash
-# Backend
-cd backend && cp .env.example .env
-npm install
-npm run migrate up
-npm run seed
-npm run dev  # Runs on :3000
-
-# Frontend (new terminal)
-cd frontend && npm install
-npm run dev  # Runs on :5173
+```
+backend/server.js          → HTTP server + WebSocket bootstrap
+backend/app.js             → Express app (middleware chain, route registration, DB init)
+backend/src/routes/        → Route aggregator; each module provides its own routes
+backend/src/modules/       → Domain modules (auth, fila, cms, catalogo, whatsapp, conversas, admin, workspaces, notifications, reports)
+backend/src/core/engine/   → FSM engine (ReisTech → StateMachine → Router → DossierBuilder)
+backend/src/core/errors/   → AppError class + global errorHandler middleware
+backend/src/core/middleware/→ auth.js (JWT + RBAC), validation.js (Joi), auditLogger.js
+backend/src/db/            → migrations/ (node-pg-migrate), models/ (Sequelize), seeds/
+backend/src/websocket/     → WebSocketServer.js
+backend/src/workspaces/packs/ → Vertical-specific JSON packs (iphone_store, law_firm, motorcycle_shop)
+frontend/src/              → React app: pages/, components/, store/ (Redux Toolkit), services/api.js, contexts/hooks/
 ```
 
-### Docker setup
+### Middleware order in `app.js`
+Helmet → CORS → rate limiter (on `/api` only) → Morgan/Winston → JSON body → URL-encoded → `GET /health` → WSS injection → API routes → 404 → errorHandler
+
+### FSM message pipeline
+`ReisTech.processMessage()` → load/create client → log inbound interaction → `StateMachine.transition()` → `Router.determineIntent()` (keyword NLP via `natural` lib) → `DossierBuilder.updateDossier()` (regex extraction, static cache, Redis Pub/Sub sync) → escalation check → log outbound
+
+## Dev workflows
+
 ```bash
+# Backend local
+cd backend && npm install && npm run dev          # :3000
+
+# Frontend local
+cd frontend && npm install && npm run dev          # :5173
+
+# Docker
 docker-compose up -d
 docker-compose exec backend npm run migrate up
 docker-compose exec backend npm run seed
+
+# Database
+npm run migrate up          # node-pg-migrate (NOT Sequelize CLI)
+npm run migrate:create name # new migration file
+npm run seed                # idempotent
+npm run db:reset            # down → up → seed
+
+# Tests (run from backend/ or frontend/)
+npm test                    # Jest (backend: jest.config.js, frontend: jest.config.cjs)
+npm run test:coverage       # coverage report
+npm run lint && npm run format
 ```
 
-### Database operations
-- **Migrations**: `npm run migrate up/down`, create new: `npm run migrate:create <name>`
-- **Seeds**: `npm run seed` (idempotent, safe to re-run)
-- **Reset DB**: `npm run db:reset` (down → up → seed)
-- **Important**: Migrations use `node-pg-migrate`, not Sequelize CLI
+**Three `.env` files**: root (Docker Compose), `backend/.env`, `frontend/.env`. See `docs/SETUP_LOCAL.md`.
 
-### Default URLs & credentials
-- **Local dev**: Frontend http://localhost:5173, Backend http://localhost:3000/api, WebSocket ws://localhost:3000/ws
-- **Remote (Windows Docker)**: Frontend http://192.168.100.232, Backend http://192.168.100.232:3000/api, WebSocket ws://192.168.100.232:3000/ws
-- **Default login**: contato@reiscelulares.com.br / admin@reiscelulares
-- **SMTP**: Hostinger (smtp.hostinger.com:465) - credentials in `.env`
-- **PostgreSQL**: Default port 5432, alternate Docker config uses 5433
+## Module conventions
 
-## Quality & tests
+### Backend module pattern
+Each module in `backend/src/modules/<name>/` follows: **Controller** (class, binds `this` in constructor) + **Service** + **routes file**. Routes compose middleware: `authenticate` → `authorize([roles])` → `validate(schema)` → controller method.
 
-### Backend
-```bash
-npm run test              # Run all tests
-npm run test:watch        # Watch mode
-npm run test:coverage     # Generate coverage report
-npm run lint              # ESLint
-npm run format            # Prettier
-```
-- **Test files**: Colocated with source (e.g., `DossierBuilder.test.js` alongside `DossierBuilder.js`)
-- **Framework**: Jest with Supertest for integration tests
-- **Config**: `jest.config.js` in backend root
-
-### Frontend
-```bash
-npm run test              # Jest tests
-npm run test:e2e          # Cypress E2E tests
-npm run lint              # ESLint
-npm run format            # Prettier
-```
-- **Framework**: Jest + React Testing Library + Cypress
-- **Config**: `jest.config.cjs` (CommonJS) due to Vite ESM requirements
-
-## Project-specific conventions & patterns
-
-### API structure
-- **All API routes** use `/api` prefix (configured via `API_PREFIX` env var)
-- **Route organization**: Each domain module (`auth`, `whatsapp`, `fila`, `cms`, etc.) exports routes registered in `backend/src/routes/index.js`
-- **Example endpoints**: `POST /api/catalogo/import`, `GET /api/cms/textos`, `PUT /api/cms/textos/:chave`, `POST /api/workspaces/:workspaceId/reload-rules`
-
-### FSM Engine architecture
-- **Message flow**: `ReisTech.processMessage()` → `StateMachine.transition()` → `Router.determineIntent()` → `DossierBuilder.updateDossier()` → Response generation
-- **State management**: Client state stored in PostgreSQL (`cliente_estado` table); transitions logged in `interacoes` table
-- **Escalation logic**: Deterministic rules in `ReisTech.shouldEscalateToHuman()` check for explicit requests, dossier completeness, technical complexity, or timeout
-- **Dossier**: Client context built from conversation; data extracted via regex patterns defined in workspace packs
-
-### Hot-reload rules system
-- **Endpoint**: `POST /api/workspaces/:workspaceId/reload-rules` triggers regex rules reload
-- **Sync mechanism**: `DossierBuilder.reloadRules()` clears local cache + publishes to Redis channel `reistech:reload-rules`
-- **Cluster sync**: All PM2 instances subscribe to channel and invalidate their cache on message receipt
-- **Implementation**: Static cache in `DossierBuilder.rulesCache` (Map); Redis Pub/Sub initialized in `DossierBuilder.initRedis()`
+Exception: `notifications` and `reports` are service-only (no routes), consumed internally. Workspace routes live in `backend/src/routes/workspace.routes.js` instead of inside the module.
 
 ### Error handling
-- **Custom errors**: Extend `AppError` class (`backend/src/core/errors/AppError.js`) with `message`, `code`, `statusCode`
-- **Global handler**: `errorHandler` middleware in `backend/src/core/errors/errorHandler.js` sanitizes sensitive fields, logs with Winston, returns consistent JSON response
-- **Usage**: `throw new AppError('Workspace não encontrado', 'WORKSPACE_NOT_FOUND', 404)`
+```js
+throw new AppError('Workspace não encontrado', 'WORKSPACE_NOT_FOUND', 404);
+```
+`AppError(message, code, statusCode)` — flat hierarchy, differentiated by `code` string. The `errorHandler` also catches Joi `ValidationError`, Sequelize errors, and JWT errors with specific status codes. Sensitive fields are redacted before logging.
 
-### Authentication & authorization
-- **JWT flow**: Access token (15min) + refresh token (30d); tokens in `Authorization: Bearer` header
-- **Frontend client**: Axios instance in `frontend/src/services/api.js` with auto-refresh interceptor (401 → refresh + retry → logout on fail)
-- **RBAC**: Roles/permissions seeded from `backend/src/db/seeds/`; enforced via middleware in module routes
-- **WebSocket auth**: Connect to `/ws?token=<JWT>`; token verified on connection, decoded user stored in `ws.userId`, `ws.workspaceId`, `ws.userRole`
+### API routes
+All behind `/api` prefix. Key prefixes: `/auth`, `/whatsapp`, `/cms`, `/catalogo`, `/fila`, `/admin`, `/conversas`, `/workspaces`. Route map in `backend/src/routes/index.js`.
 
-### WebSocket patterns
-- **Client hook**: `useWebSocket()` in `frontend/src/contexts/hooks/useWebSocket.js` handles connection, reconnection (exponential backoff), subscriptions
-- **Channels**: `fila_updates`, `new_messages`, `notifications`; subscribe via `{type:'subscribe', channel:'...'}`
-- **Server architecture**: `WebSocketServer` tracks clients by userId (Map), workspace subscriptions, channel subscriptions; supports heartbeat/ping-pong
+## Frontend patterns
 
-### CMS texts system
-- **Purpose**: No-code message customization per workspace
-- **Model**: `TextoCms` in `backend/src/db/models/TextoCms.js`; unique key per workspace
-- **Pack integration**: Each pack JSON defines `textos_cms` array with default texts; seeded on workspace creation
-- **Usage**: Retrieve texts via CMS module endpoints (`GET /api/cms/textos`, `PUT /api/cms/textos/:chave`)
+- **State**: Redux Toolkit with 4 slices: `authSlice`, `uiSlice`, `websocketSlice`, `notificationSlice`
+- **API client**: `frontend/src/services/api.js` — Axios instance with auto-refresh interceptor (401 → refresh token → retry; 403 → logout). Store reference injected via `injectStore()` to avoid circular deps.
+- **Routing**: React Router v6 with lazy loading. Protected routes under `/painel/*`; public route at `/login`.
+- **WebSocket**: Custom hook `useWebSocket()` with exponential backoff reconnection. Channels: `fila_updates`, `new_messages`, `notifications`.
+- **Provider hierarchy**: Redux Provider → BrowserRouter → NotificationProvider → ThemeProvider → CssBaseline → App
 
-### Workspace packs
-- **Location**: `backend/src/workspaces/packs/*.json` (iphone_store, law_firm, motorcycle_shop)
-- **Structure**: `name`, `key`, `version`, `config` (WhatsApp settings, catalog config), `textos_cms` (default messages), `fluxos` (state definitions, data collection rules)
-- **Loading**: Packs read at runtime; changes require hot-reload via `/reload-rules` endpoint
+### Authentication (JWT)
+- **Access token**: 15 min, sent via `Authorization: Bearer`
+- **Refresh token**: 30 days, stored as SHA-256 hash in `refresh_tokens` table
+- **Frontend flow**: 401 → automatic refresh via interceptor; 403 → forced logout
+- **WebSocket auth**: connect to `/ws` with JWT in query param or `Authorization` header
 
-## Integrations & infrastructure
+### WebSocket protocol
+- **Subscribe**: `{ type: 'subscribe', channel: '...' }`
+- **Channels**: `fila_updates`, `new_messages`, `notifications`
+- **Reconnection**: exponential backoff, max 5 attempts (client-side in `useWebSocket()`)
 
-### WhatsApp
-- **Library**: whatsapp-web.js (Puppeteer-based)
-- **Sessions**: Persist in `backend/whatsapp-sessions/` directory
-- **Config**: `WHATSAPP_SESSION_PATH`, `WHATSAPP_PUPPETEER_ARGS` (use `--no-sandbox,--disable-setuid-sandbox` in containers)
-- **Initialization**: Non-blocking startup in `backend/app.js` (1s delay after DB connect)
+### CMS texts
+- **Model**: `TextoCms` — unique `chave` per `workspace_id`
+- **Usage**: `Router.getCmsTextForState()` for FSM responses; CRUD via `/api/cms/textos`
+- **Packs**: each JSON pack includes `textos_cms[]` with default messages seeded on workspace creation
 
-### PostgreSQL
-- **Ports**: 5432 (local/Docker default), 5433 (alternate Docker config)
-- **Connection**: Sequelize via `backend/src/config/database.js`; credentials from `.env` (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`)
-- **Required**: Core dependency; app exits if connection fails
+### Hot-reload rules
+- **Endpoint**: `POST /api/workspaces/:workspaceId/reload-rules`
+- **Mechanism**: `DossierBuilder.reloadRules()` → clears static `rulesCache` (Map) → publishes to Redis channel `reistech:reload-rules`
+- **Cluster sync**: all PM2 instances subscribe to the channel and invalidate their local cache on message
 
-### Redis
-- **Optional** but recommended for production (rate limiting, session store, hot-reload sync)
-- **Port**: 6379
-- **Config**: `REDIS_URL` env var (example: `redis://localhost:6379`)
-- **Pub/Sub**: Channel `reistech:reload-rules` for FSM rule synchronization across cluster
+## Database
 
-### Production deployment
-- **PM2 cluster**: 4 instances via `ecosystem.config.js`; auto-restart, memory limit 1GB, graceful shutdown
-- **Deploy script**: `scripts/deploy-production.sh` (sets up non-root user, secure permissions, systemd service)
-- **Reverse proxy**: Traefik configured in `docker-compose.prod.yml` for HTTPS termination
+- **ORM**: Sequelize models in `backend/src/db/models/` (11 models: Workspace, User, RefreshToken, Cliente, ConversaInteracao, ClienteEstado, FilaHumana, TextoCms, CatalogoItem, AuditLog, Notification)
+- **Migrations**: `node-pg-migrate`, files numbered `NNN_<verb>_<entity>.js` (e.g., `005_create_conversas_interacoes.js`)
+- **Dual connection**: Sequelize ORM + raw `pg` Pool in `backend/src/config/database.js`
+- **Multi-tenant isolation**: Most models `belongsTo: Workspace`; always filter by `workspace_id`
 
-## Key file reference
-- **Entry points**: `backend/server.js` (HTTP + WebSocket), `backend/app.js` (Express app), `frontend/src/main.jsx` (React root)
-- **Routing**: `backend/src/routes/index.js` (aggregates module routes), `backend/src/routes/workspace.routes.js` (reload endpoint)
-- **FSM engine**: `backend/src/core/engine/ReisTech.js` (orchestrator), `StateMachine.js` (state logic), `Router.js` (intent detection, response generation), `DossierBuilder.js` (data extraction, caching, Redis sync)
-- **WebSocket**: `backend/src/websocket/WebSocketServer.js` (server), `frontend/src/contexts/hooks/useWebSocket.js` (React hook)
-- **Packs**: `backend/src/workspaces/packs/iphone_store.json`, `law_firm.json`, `motorcycle_shop.json`
-- **Auth client**: `frontend/src/services/api.js` (Axios instance with JWT interceptor), `frontend/src/store/authSlice.js` (Redux state + refresh logic)
+## Workspace packs
+
+JSON files in `backend/src/workspaces/packs/` define vertical behavior:
+```json
+{ "name", "key", "version",
+  "config": { "whatsapp": {...}, "catalogo": {...}, "fluxos": [...] },
+  "textos_cms": [{ "chave": "menu.principal.titulo", "conteudo": "...", "ativo": true }],
+  "fluxos": { "<flow_name>": { "estados": [...], "coleta_dados": [{ "campo", "pergunta", "obrigatorio", "tipo" }] } }
+}
+```
+Changes require hot-reload: `POST /api/workspaces/:id/reload-rules` → clears `DossierBuilder.rulesCache` → publishes to Redis channel `reistech:reload-rules`.
+
+## Testing conventions
+
+- **Colocated tests**: `*.test.js` next to source (e.g., `DossierBuilder.test.js` alongside `DossierBuilder.js`). Integration tests also in `backend/tests/integration/`.
+- **Mocks**: Manual `jest.mock()` for each dependency (Sequelize models, `fs`, `ioredis`). Use `beforeEach` to clear static caches.
+- **Test language**: Descriptions in Portuguese (`'deve retornar dossiê vazio...'`).
+- **Frontend**: Jest + React Testing Library; E2E with Cypress (`frontend/cypress/`).
+
+## Key integrations
+
+- **WhatsApp**: whatsapp-web.js (Puppeteer). Sessions in `backend/whatsapp-sessions/`. Non-blocking init with 1s delay. Use `--no-sandbox` in containers.
+- **Redis**: Optional. Used for rate limiting, token blacklist, and FSM rule sync (Pub/Sub on `reistech:reload-rules`).
+- **Production**: PM2 cluster (4 instances, `ecosystem.config.js`), deploy via `scripts/deploy-production.sh`, Traefik reverse proxy in `docker-compose.prod.yml`.
+
+## ⚠️ Known issues / inconsistencies
+
+- **Modelo `Notification` órfão**: definido em `backend/src/db/models/Notification.js` mas **não registrado** no `models/index.js`. Migration `011` cria a tabela, porém o ORM não a mapeia.
+- **Páginas sem rota no frontend**: `Relatorios.jsx` e `Dashboard.jsx` existem em `frontend/src/pages/` mas **não possuem rotas** configuradas no `App.jsx`.
+- **Teste duplicado de `DossierBuilder`**: arquivos de teste em `backend/src/core/engine/DossierBuilder.test.js` (colocado) e `backend/tests/unit/DossierBuilder.test.js`. Manter apenas a versão atualizada.
+- **Health endpoints**: README documenta `/health/db`, `/health/redis`, `/health/whatsapp`, mas apenas `GET /health` está implementado em `app.js`.
