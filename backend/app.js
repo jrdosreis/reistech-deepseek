@@ -9,7 +9,9 @@ const logger = require('./src/config/logger');
 const { errorHandler } = require('./src/core/errors/errorHandler');
 const routes = require('./src/routes');
 const { initializeDatabase } = require('./src/db/models');
-const { initializeWhatsApp } = require('./src/modules/whatsapp/WhatsAppService');
+const { initializeWhatsApp, getWhatsAppService } = require('./src/modules/whatsapp/WhatsAppService');
+const db = require('./src/db/models');
+const cacheService = require('./services/cacheService');
 
 const app = express();
 
@@ -50,6 +52,86 @@ app.get('/health', (req, res) => {
       version: '1.0.0',
     },
   });
+});
+
+// Health check - Database
+app.get('/health/db', async (req, res) => {
+  try {
+    await db.sequelize.authenticate();
+    res.json({
+      success: true,
+      data: {
+        status: 'ok',
+        database: 'connected',
+        timestamp: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    res.status(503).json({
+      success: false,
+      error: 'Banco de dados desconectado',
+      code: 'DATABASE_DISCONNECTED',
+      details: error.message,
+    });
+  }
+});
+
+// Health check - Redis
+app.get('/health/redis', async (req, res) => {
+  if (!cacheService.connected) {
+    return res.status(503).json({
+      success: false,
+      error: 'Redis desconectado',
+      code: 'REDIS_DISCONNECTED',
+    });
+  }
+  
+  try {
+    const testKey = `health:test:${Date.now()}`;
+    await cacheService.set(testKey, 'ok', 'EX', 5);
+    const value = await cacheService.get(testKey);
+    
+    res.json({
+      success: true,
+      data: {
+        status: 'ok',
+        redis: 'connected',
+        timestamp: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    res.status(503).json({
+      success: false,
+      error: 'Erro ao testar Redis',
+      code: 'REDIS_ERROR',
+      details: error.message,
+    });
+  }
+});
+
+// Health check - WhatsApp
+app.get('/health/whatsapp', (req, res) => {
+  try {
+    const whatsappService = getWhatsAppService();
+    const status = whatsappService.getStatus();
+    
+    res.json({
+      success: true,
+      data: {
+        status: status.connected ? 'ok' : 'degraded',
+        whatsapp: status.status,
+        qr: status.qrCode || null,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    res.status(503).json({
+      success: false,
+      error: 'Erro ao verificar status do WhatsApp',
+      code: 'WHATSAPP_ERROR',
+      details: error.message,
+    });
+  }
 });
 
 // Disponibilizar wss quando existir
