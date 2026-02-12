@@ -33,6 +33,9 @@ package-lock.json
 *.old
 backups/
 
+# Cleanup trash
+trash/
+
 # Build outputs
 dist/
 build/

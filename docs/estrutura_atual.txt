@@ -1,0 +1,258 @@
+.
+├── .env
+├── .env.example
+├── .github
+│   ├── ISSUE_TEMPLATE
+│   │   ├── bug_report.md
+│   │   └── feature_request.md
+│   ├── PULL_REQUEST_TEMPLATE.md
+│   ├── copilot-instructions.md
+│   └── workflows
+│       ├── backend.yml
+│       ├── ci-cd.yml
+│       └── frontend.yml
+├── .gitignore
+├── .vscode
+│   ├── launch.json
+│   ├── settings.json
+│   └── tasks.json
+├── README.md
+├── backend
+│   ├── .dockerignore
+│   ├── .env.example
+│   ├── .eslintrc.json
+│   ├── .prettierrc
+│   ├── Dockerfile.prod
+│   ├── app.js
+│   ├── ecosystem.config.js
+│   ├── jest.config.js
+│   ├── jest.setup.js
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── server.js
+│   ├── services
+│   │   ├── cacheService.js
+│   │   └── tokenBlacklist.js
+│   ├── src
+│   │   ├── config
+│   │   │   ├── database.js
+│   │   │   ├── env.js
+│   │   │   └── logger.js
+│   │   ├── core
+│   │   │   ├── engine
+│   │   │   │   ├── DossierBuilder.js
+│   │   │   │   ├── DossierBuilder.test.js
+│   │   │   │   ├── ReisTech.js
+│   │   │   │   ├── Router.js
+│   │   │   │   └── StateMachine.js
+│   │   │   ├── errors
+│   │   │   │   ├── AppError.js
+│   │   │   │   └── errorHandler.js
+│   │   │   ├── middleware
+│   │   │   │   ├── audit.js
+│   │   │   │   ├── auth.js
+│   │   │   │   └── validation.js
+│   │   │   └── utils
+│   │   │       └── response.js
+│   │   ├── db
+│   │   │   ├── migrations
+│   │   │   │   ├── 000_create_updated_at_function.js
+│   │   │   │   ├── 001_create_workspaces.js
+│   │   │   │   ├── 002_create_users.js
+│   │   │   │   ├── 003_create_refresh_tokens.js
+│   │   │   │   ├── 004_create_clientes.js
+│   │   │   │   ├── 005_create_conversas_interacoes.js
+│   │   │   │   ├── 006_create_clientes_estado.js
+│   │   │   │   ├── 007_create_fila_humana.js
+│   │   │   │   ├── 008_create_textos_cms.js
+│   │   │   │   ├── 009_create_catalogo_itens.js
+│   │   │   │   ├── 010_create_audit_logs.js
+│   │   │   │   ├── 011_create_notifications.js
+│   │   │   │   ├── 012_add_composite_index_fila_humana.js
+│   │   │   │   └── 013_optimize_list_conversas.js
+│   │   │   ├── models
+│   │   │   │   ├── AuditLog.js
+│   │   │   │   ├── CatalogoItem.js
+│   │   │   │   ├── Cliente.js
+│   │   │   │   ├── ClienteEstado.js
+│   │   │   │   ├── ConversaInteracao.js
+│   │   │   │   ├── FilaHumana.js
+│   │   │   │   ├── Notification.js
+│   │   │   │   ├── RefreshToken.js
+│   │   │   │   ├── TextoCms.js
+│   │   │   │   ├── User.js
+│   │   │   │   ├── Workspace.js
+│   │   │   │   └── index.js
+│   │   │   └── seeds
+│   │   │       ├── 001_initial_workspace.js
+│   │   │       ├── 002_initial_users.js
+│   │   │       ├── 003_initial_textos.js
+│   │   │       ├── 004_initial_catalogo.js
+│   │   │       └── runner.js
+│   │   ├── modules
+│   │   │   ├── admin
+│   │   │   │   ├── AdminController.js
+│   │   │   │   ├── AdminService.js
+│   │   │   │   └── routes.js
+│   │   │   ├── auth
+│   │   │   │   ├── AuthController.js
+│   │   │   │   └── routes.js
+│   │   │   ├── catalogo
+│   │   │   │   ├── CatalogoController.js
+│   │   │   │   ├── CatalogoService.js
+│   │   │   │   └── routes.js
+│   │   │   ├── cms
+│   │   │   │   ├── CmsController.js
+│   │   │   │   ├── CmsService.js
+│   │   │   │   └── routes.js
+│   │   │   ├── conversas
+│   │   │   │   ├── ConversasController.js
+│   │   │   │   ├── ConversasService.js
+│   │   │   │   └── routes.js
+│   │   │   ├── fila
+│   │   │   │   ├── FilaController.js
+│   │   │   │   ├── FilaService.js
+│   │   │   │   └── routes.js
+│   │   │   ├── notifications
+│   │   │   │   └── NotificationService.js
+│   │   │   ├── reports
+│   │   │   │   └── ReportService.js
+│   │   │   ├── whatsapp
+│   │   │   │   ├── WhatsAppController.js
+│   │   │   │   ├── WhatsAppService.js
+│   │   │   │   └── routes.js
+│   │   │   └── workspaces
+│   │   │       ├── README.md
+│   │   │       ├── WorkspaceController.js
+│   │   │       └── WorkspaceService.js
+│   │   ├── routes
+│   │   │   ├── index.js
+│   │   │   └── workspace.routes.js
+│   │   ├── websocket
+│   │   │   ├── WebSocketServer.js
+│   │   │   └── eventHandlers.js
+│   │   └── workspaces
+│   │       ├── VerticalPackLoader.js
+│   │       ├── WorkspaceService.js
+│   │       └── packs
+│   │           ├── iphone_store.json
+│   │           ├── law_firm.json
+│   │           └── motorcycle_shop.json
+│   └── tests
+│       ├── integration
+│       │   ├── auth.test.js
+│       │   └── whatsapp.test.js
+│       └── unit
+│           ├── CacheService.test.js
+│           ├── DossierBuilder.test.js
+│           ├── ReisTechEngine.test.js
+│           ├── Router.test.js
+│           └── StateMachine.test.js
+├── docker-compose.prod.yml
+├── docker-compose.yml
+├── docs
+│   ├── CI_CD_TROUBLESHOOTING.md
+│   ├── DOCKER_REMOTE_MAC_WINDOWS.md
+│   ├── ESTRUTURA.md
+│   ├── FAQ.md
+│   ├── MIGRATION_GUIDE.md
+│   ├── ORGANIZACAO.md
+│   ├── OTIMIZACAO_PRODUCAO.md
+│   ├── PERFORMANCE.md
+│   ├── RESUMO_ORGANIZACAO.md
+│   ├── SETUP_LOCAL.md
+│   ├── STACK_DETALHADA.md
+│   ├── api_endpoints_documentacao.yaml
+│   ├── archive
+│   │   ├── NEXTEPS_STATUS.md
+│   │   └── STATUS_FINAL.md
+│   ├── arquivos_ignorados.txt
+│   ├── diagrama_arquitetura_sistema.md
+│   ├── diagrama_arquitetura_sistema.png
+│   ├── diagrama_arquitetura_sistema.txt
+│   ├── estrutura_atual.txt
+│   ├── estrutura_banco_dados.sql
+│   ├── fluxos_conversacionais_nichos.csv
+│   ├── github
+│   │   ├── CODE_OF_CONDUCT.md
+│   │   ├── CONTRIBUTING.md
+│   │   ├── GITHUB_CHECKLIST.md
+│   │   ├── GITHUB_SETUP.md
+│   │   └── LICENSE
+│   ├── manuals
+│   │   ├── MANUAL-OFICIAL.html
+│   │   └── manual-reistech-legacy.html
+│   ├── pastas_vazias.txt
+│   ├── reistech_especificacao_tecnica.md
+│   ├── reistech_especificacao_tecnica.pdf
+│   └── relatorio_limpeza.md
+├── frontend
+│   ├── .dockerignore
+│   ├── .env.example
+│   ├── .eslintignore
+│   ├── .eslintrc.cjs
+│   ├── Dockerfile.prod
+│   ├── babel.config.cjs
+│   ├── cypress
+│   │   └── e2e
+│   │       └── login.cy.js
+│   ├── cypress.config.cjs
+│   ├── index.html
+│   ├── jest.config.cjs
+│   ├── jest.setup.js
+│   ├── nginx.conf
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── src
+│   │   ├── App.jsx
+│   │   ├── components
+│   │   │   ├── layout
+│   │   │   │   ├── Layout.jsx
+│   │   │   │   └── PrivateRoute.jsx
+│   │   │   └── notifications
+│   │   │       └── NotificationCenter.jsx
+│   │   ├── config
+│   │   │   └── theme.js
+│   │   ├── contexts
+│   │   │   ├── NotificationContext.jsx
+│   │   │   └── hooks
+│   │   │       └── useWebSocket.js
+│   │   ├── index.css
+│   │   ├── main.jsx
+│   │   ├── pages
+│   │   │   ├── Catalogo.jsx
+│   │   │   ├── Configuracao.jsx
+│   │   │   ├── Conversas.jsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── FilaHumana.jsx
+│   │   │   ├── Login.jsx
+│   │   │   ├── Relatorios.jsx
+│   │   │   ├── TextosCms.jsx
+│   │   │   └── WhatsApp.jsx
+│   │   ├── services
+│   │   │   └── api.js
+│   │   ├── store
+│   │   │   ├── authSlice.js
+│   │   │   ├── index.js
+│   │   │   ├── notificationsSlice.js
+│   │   │   ├── uiSlice.js
+│   │   │   └── websocketSlice.js
+│   │   └── tests
+│   │       └── Login.test.jsx
+│   └── vite.config.js
+├── logs
+│   └── .gitkeep
+└── scripts
+    ├── PREPARE_FOR_WINDOWS.sh
+    ├── aliases-reistech.sh
+    ├── auditoria-macbook.sh
+    ├── backup-projeto.sh
+    ├── backup.sh
+    ├── deploy-production.sh
+    ├── instalar-otimizacoes.sh
+    ├── limpar-macbook.sh
+    ├── testar-conexao-windows.sh
+    ├── verificar-estrutura.sh
+    └── verificar-tudo.sh
+
+56 directories, 200 files
