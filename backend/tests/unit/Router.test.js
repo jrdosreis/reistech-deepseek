@@ -2,7 +2,7 @@
  * Testes unitários – Router
  */
 
-jest.mock('../../../src/db/models', () => ({
+jest.mock('../../src/db/models', () => ({
   TextoCms: {
     findOne: jest.fn(),
     findAll: jest.fn(),
@@ -12,15 +12,15 @@ jest.mock('../../../src/db/models', () => ({
   },
 }));
 
-jest.mock('../../../src/config/logger', () => ({
+jest.mock('../../src/config/logger', () => ({
   info: jest.fn(),
   warn: jest.fn(),
   error: jest.fn(),
   debug: jest.fn(),
 }));
 
-const Router = require('../../../src/core/engine/Router');
-const db = require('../../../src/db/models');
+const Router = require('../../src/core/engine/Router');
+const db = require('../../src/db/models');
 
 describe('Router', () => {
   let router;

@@ -3,7 +3,7 @@
  */
 
 // Mocks de dependências
-jest.mock('../../../src/db/models', () => ({
+jest.mock('../../src/db/models', () => ({
   Cliente: {
     findOne: jest.fn(),
     create: jest.fn(),
@@ -16,19 +16,19 @@ jest.mock('../../../src/db/models', () => ({
     create: jest.fn(),
   },
   sequelize: {
-    transaction: jest.fn((cb) => cb({ commit: jest.fn(), rollback: jest.fn() })),
+    transaction: jest.fn(() => Promise.resolve({ commit: jest.fn(), rollback: jest.fn() })),
   },
 }));
 
-jest.mock('../../../src/config/logger', () => ({
+jest.mock('../../src/config/logger', () => ({
   info: jest.fn(),
   warn: jest.fn(),
   error: jest.fn(),
   debug: jest.fn(),
 }));
 
-const StateMachine = require('../../../src/core/engine/StateMachine');
-const db = require('../../../src/db/models');
+const StateMachine = require('../../src/core/engine/StateMachine');
+const db = require('../../src/db/models');
 
 describe('StateMachine', () => {
   let sm;

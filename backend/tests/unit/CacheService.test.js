@@ -36,13 +36,10 @@ jest.mock('redis', () => {
   };
 });
 
-const CacheService = require('../../../services/cacheService');
+const cache = require('../../services/cacheService');
 
 describe('CacheService', () => {
-  let cache;
-
   beforeEach(() => {
-    cache = new CacheService();
     cache.metrics = { hits: 0, misses: 0, sets: 0, deletes: 0, errors: 0 };
   });
 

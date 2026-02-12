@@ -2,7 +2,7 @@
  * Testes unitários – DossierBuilder
  */
 
-jest.mock('../../../src/db/models', () => ({
+jest.mock('../../src/db/models', () => ({
   ClienteEstado: {
     findOne: jest.fn(),
   },
@@ -17,7 +17,7 @@ jest.mock('../../../src/db/models', () => ({
   Sequelize: {},
 }));
 
-jest.mock('../../../src/config/logger', () => ({
+jest.mock('../../src/config/logger', () => ({
   info: jest.fn(),
   warn: jest.fn(),
   error: jest.fn(),
@@ -32,8 +32,8 @@ jest.mock('ioredis', () => {
   }));
 });
 
-const DossierBuilder = require('../../../src/core/engine/DossierBuilder');
-const db = require('../../../src/db/models');
+const DossierBuilder = require('../../src/core/engine/DossierBuilder');
+const db = require('../../src/db/models');
 
 describe('DossierBuilder', () => {
   let builder;
