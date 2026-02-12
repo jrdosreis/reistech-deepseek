@@ -1,16 +1,24 @@
 # Copilot Instructions for AI Agents
 
+## Quick reference
+- **Tech stack**: Node.js/Express backend + React/Vite/MUI frontend + PostgreSQL + Redis (optional) + whatsapp-web.js
+- **Development approach**: Monorepo with containerized dev/prod environments; local setup also supported
+- **Key concept**: FSM-driven WhatsApp automation with multi-tenant workspace isolation and hot-reloadable business rules
+
 ## Setup documentation
 - **Official manual**: See `MANUAL-OFICIAL.html` for complete Docker + remote development setup (Windows Docker host + MacBook development)
+- **Local setup guide**: `docs/SETUP_LOCAL.md` for non-Docker development
 - **Environment**: Windows at 192.168.100.232 (Docker host), MacBook (development station)
 - **Credentials**: All `.env` files with validated credentials documented in manual (DB, SMTP, JWT, admin access)
+- **Three `.env` files**: Root (Docker Compose), `backend/.env` (local backend), `frontend/.env` (Vite vars)
 
 ## Big picture
-- **Monorepo**: Backend Node.js/Express + frontend React/Vite + MUI; containerized via `docker-compose.yml` (production: `docker-compose.prod.yml`).
-- **Backend app**: Express app in `backend/app.js`, HTTP server in `backend/server.js`; routes under `backend/src/routes/` and domain modules under `backend/src/modules/` behind `/api` prefix.
-- **FSM engine**: Deterministic engine in `backend/src/core/engine/` (classes: `ReisTech.js`, `StateMachine.js`, `Router.js`, `DossierBuilder.js`) manages WhatsApp conversation flow; workspace packs in `backend/src/workspaces/packs/` (JSON files) define vertical-specific behavior.
-- **Real-time**: WebSocket server in `backend/src/websocket/WebSocketServer.js` with React hook at `frontend/src/contexts/hooks/useWebSocket.js`.
-- **Data layer**: Migrations in `backend/src/db/migrations/`, Sequelize models in `backend/src/db/models/`, seeds in `backend/src/db/seeds/`.
+- **Monorepo**: Backend Node.js/Express + frontend React/Vite + MUI; containerized via `docker-compose.yml` (production: `docker-compose.prod.yml`)
+- **Backend app**: Express app in `backend/app.js`, HTTP server in `backend/server.js`; routes under `backend/src/routes/` and domain modules under `backend/src/modules/` behind `/api` prefix
+- **FSM engine**: Deterministic engine in `backend/src/core/engine/` (classes: `ReisTech.js`, `StateMachine.js`, `Router.js`, `DossierBuilder.js`) manages WhatsApp conversation flow; workspace packs in `backend/src/workspaces/packs/` (JSON files) define vertical-specific behavior
+- **Real-time**: WebSocket server in `backend/src/websocket/WebSocketServer.js` with React hook at `frontend/src/contexts/hooks/useWebSocket.js`
+- **Data layer**: Migrations in `backend/src/db/migrations/`, Sequelize models in `backend/src/db/models/`, seeds in `backend/src/db/seeds/`
+- **Multi-tenant**: Each workspace has isolated configuration (pack), CMS texts, catalog, and client state; workspace ID used throughout system for data isolation
 
 ## Critical workflows
 
@@ -39,12 +47,14 @@ docker-compose exec backend npm run seed
 - **Migrations**: `npm run migrate up/down`, create new: `npm run migrate:create <name>`
 - **Seeds**: `npm run seed` (idempotent, safe to re-run)
 - **Reset DB**: `npm run db:reset` (down → up → seed)
+- **Important**: Migrations use `node-pg-migrate`, not Sequelize CLI
 
 ### Default URLs & credentials
 - **Local dev**: Frontend http://localhost:5173, Backend http://localhost:3000/api, WebSocket ws://localhost:3000/ws
 - **Remote (Windows Docker)**: Frontend http://192.168.100.232, Backend http://192.168.100.232:3000/api, WebSocket ws://192.168.100.232:3000/ws
 - **Default login**: contato@reiscelulares.com.br / admin@reiscelulares
 - **SMTP**: Hostinger (smtp.hostinger.com:465) - credentials in `.env`
+- **PostgreSQL**: Default port 5432, alternate Docker config uses 5433
 
 ## Quality & tests
 
@@ -56,6 +66,9 @@ npm run test:coverage     # Generate coverage report
 npm run lint              # ESLint
 npm run format            # Prettier
 ```
+- **Test files**: Colocated with source (e.g., `DossierBuilder.test.js` alongside `DossierBuilder.js`)
+- **Framework**: Jest with Supertest for integration tests
+- **Config**: `jest.config.js` in backend root
 
 ### Frontend
 ```bash
@@ -64,6 +77,8 @@ npm run test:e2e          # Cypress E2E tests
 npm run lint              # ESLint
 npm run format            # Prettier
 ```
+- **Framework**: Jest + React Testing Library + Cypress
+- **Config**: `jest.config.cjs` (CommonJS) due to Vite ESM requirements
 
 ## Project-specific conventions & patterns
 

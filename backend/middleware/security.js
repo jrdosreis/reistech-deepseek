@@ -14,10 +14,10 @@
 const helmet = require('helmet');
 const cors = require('cors');
 const xss = require('xss-clean');
-const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
+const { cpf: cpfValidator } = require('cpf-cnpj-validator');
 
 class SecurityMiddleware {
   /**
@@ -103,18 +103,6 @@ class SecurityMiddleware {
   }
 
   /**
-   * Sanitização contra NoSQL Injection
-   */
-  static sanitizeNoSQL() {
-    return mongoSanitize({
-      replaceWith: '_',
-      onSanitize: ({ key }) => {
-        console.warn(`⚠️ NoSQL injection attempt detected: ${key}`);
-      }
-    });
-  }
-
-  /**
    * Proteção contra XSS
    */
   static xssProtection() {
@@ -148,7 +136,9 @@ class SecurityMiddleware {
             continue;
           }
 
-          if (!value) continue;
+          if (!value) {
+            continue;
+          }
 
           // Type validation
           if (rules.type === 'email' && !validator.isEmail(value)) {
@@ -163,7 +153,7 @@ class SecurityMiddleware {
             errors.push(`Campo '${field}' deve ser um telefone válido`);
           }
 
-          if (rules.type === 'cpf' && !this._validateCPF(value)) {
+          if (rules.type === 'cpf' && !cpfValidator.isValid(value)) {
             errors.push(`Campo '${field}' deve ser um CPF válido`);
           }
 
@@ -218,34 +208,6 @@ class SecurityMiddleware {
 
       next();
     };
-  }
-
-  /**
-   * Validação de CPF
-   */
-  static _validateCPF(cpf) {
-    cpf = cpf.replace(/[^\d]/g, '');
-
-    if (cpf.length !== 11) return false;
-    if (/^(\d)\1+$/.test(cpf)) return false;
-
-    let sum = 0;
-    for (let i = 0; i < 9; i++) {
-      sum += parseInt(cpf.charAt(i), 10) * (10 - i);
-    }
-    let digit = 11 - (sum % 11);
-    if (digit > 9) digit = 0;
-    if (digit !== parseInt(cpf.charAt(9), 10)) return false;
-
-    sum = 0;
-    for (let i = 0; i < 10; i++) {
-      sum += parseInt(cpf.charAt(i), 10) * (11 - i);
-    }
-    digit = 11 - (sum % 11);
-    if (digit > 9) digit = 0;
-    if (digit !== parseInt(cpf.charAt(10), 10)) return false;
-
-    return true;
   }
 
   /**
