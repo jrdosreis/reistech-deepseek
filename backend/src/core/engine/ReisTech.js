@@ -5,11 +5,18 @@ const DossierBuilder = require('./DossierBuilder');
 const { AppError } = require('../errors/AppError');
 
 class ReisTechEngine {
-  constructor(workspaceId) {
+  /**
+   * @param {string} workspaceId
+   * @param {object} [deps] - Dependências injetáveis (útil para testes)
+   * @param {StateMachine} [deps.stateMachine]
+   * @param {Router}       [deps.router]
+   * @param {DossierBuilder} [deps.dossierBuilder]
+   */
+  constructor(workspaceId, deps = {}) {
     this.workspaceId = workspaceId;
-    this.stateMachine = new StateMachine(workspaceId);
-    this.router = new Router(workspaceId);
-    this.dossierBuilder = new DossierBuilder(workspaceId);
+    this.stateMachine = deps.stateMachine || new StateMachine(workspaceId);
+    this.router = deps.router || new Router(workspaceId);
+    this.dossierBuilder = deps.dossierBuilder || new DossierBuilder(workspaceId);
     this.activeSessions = new Map();
   }
 
