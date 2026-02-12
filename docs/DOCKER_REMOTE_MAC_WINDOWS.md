@@ -1,6 +1,57 @@
 # 🔧 Guia: Conectar Mac ao Docker do Windows
 
-## 📋 Diagnóstico Atual
+> ## ⚠️ ATENÇÃO – SEGURANÇA
+> 
+> Expor o Docker daemon na porta 2375 sem TLS permite que **qualquer dispositivo na rede** controle seu Docker host.
+> **Não utilize esta configuração em redes não confiáveis.**
+> 
+> Prefira utilizar **SSH tunneling** ou **Docker contexts com SSH**.
+> Consulte a seção "Alternativa Segura – SSH Tunnel" abaixo.
+
+---
+
+## 🔒 Alternativa Segura – SSH Tunnel
+
+Em vez de expor a porta 2375 diretamente, utilize uma das opções:
+
+### Opção 1 – SSH Tunnel
+
+```bash
+# No MacBook, abra um tunnel SSH para o Docker daemon do Windows
+ssh -N -L 2375:localhost:2375 usuario@192.168.100.232
+
+# Em outro terminal, configure o Docker host:
+export DOCKER_HOST="tcp://localhost:2375"
+docker version
+```
+
+### Opção 2 – Docker Context com SSH
+
+```bash
+# Criar um context SSH (uma vez)
+docker context create windows --docker "host=ssh://usuario@192.168.100.232"
+
+# Usar o context
+docker context use windows
+docker version
+```
+
+### Opção 3 – Firewall restrito ao IP do MacBook
+
+Se optar por expor a porta 2375, restrinja o acesso apenas ao IP do MacBook:
+
+```powershell
+New-NetFirewallRule `
+  -DisplayName "Docker Remote API (Restricted)" `
+  -Direction Inbound `
+  -LocalPort 2375 `
+  -Protocol TCP `
+  -Action Allow `
+  -RemoteAddress "192.168.100.16" `
+  -Profile Domain,Private
+```
+
+---
 
 **Status:** ❌ Conexão falhando  
 **Mac IP:** 192.168.100.16  

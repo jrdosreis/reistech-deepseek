@@ -3,6 +3,11 @@
 echo "🚀 PREPARADOR DE MIGRAÇÃO REISTECH PARA WINDOWS"
 echo "=============================================="
 echo ""
+echo "⚠️  AVISO DE SEGURANÇA: Expor o Docker daemon na porta 2375"
+echo "   sem TLS permite que qualquer dispositivo na rede controle"
+echo "   seu Docker host. Prefira SSH tunneling ou Docker contexts SSH."
+echo "   Consulte: docs/DOCKER_REMOTE_MAC_WINDOWS.md"
+echo ""
 
 echo "📋 ESTE SCRIPT IRÁ:"
 echo "1. ✅ Criar backup completo do projeto"

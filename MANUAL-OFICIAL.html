@@ -152,6 +152,21 @@ docker run hello-world
 </div>
 
 <h2>2. CONFIGURAR ACESSO REMOTO (PORTA 2375)</h2>
+
+<div class="warning" style="background-color: #fff3cd; border: 2px solid #dc3545; border-radius: 8px; padding: 16px; margin: 16px 0; color: #721c24;">
+  <strong>⚠️ ATENÇÃO – SEGURANÇA</strong><br>
+  Expor o Docker daemon na porta 2375 sem TLS permite que <strong>qualquer dispositivo na rede</strong> controle seu Docker host.
+  <strong>Não utilize esta configuração em redes não confiáveis.</strong><br><br>
+  Prefira utilizar <strong>SSH tunneling</strong> ou <strong>Docker contexts com SSH</strong>.<br>
+  Caso precise usar a porta 2375, <strong>restrinja o firewall</strong> para aceitar conexões apenas do IP do MacBook.<br><br>
+  <strong>Alternativas seguras:</strong>
+  <ul style="margin-top: 8px;">
+    <li><code>ssh -N -L 2375:localhost:2375 usuario@windows_ip</code> (SSH tunnel)</li>
+    <li><code>docker context create windows --docker "host=ssh://usuario@windows_ip"</code> (Docker context SSH)</li>
+    <li>Restringir firewall: <code>New-NetFirewallRule ... -RemoteAddress "IP_DO_MACBOOK"</code></li>
+  </ul>
+</div>
+
 <p><strong>Opção A – Interface Gráfica (RECOMENDADA):</strong></p>
 <ol>
     <li>Clique direito no ícone do Docker (bandeja do sistema) → <strong>Settings</strong>.</li>

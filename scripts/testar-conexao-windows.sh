@@ -11,6 +11,11 @@ echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}🌐 TESTADOR DE CONEXÃO WINDOWS-MAC${NC}"
 echo -e "${BLUE}========================================${NC}"
 
+echo -e "${RED}⚠️  AVISO DE SEGURANÇA: Expor o Docker daemon na porta 2375${NC}"
+echo -e "${RED}   sem TLS permite que qualquer dispositivo na rede controle${NC}"
+echo -e "${RED}   seu Docker host. Prefira SSH tunneling ou Docker contexts SSH.${NC}"
+echo -e "${RED}   Consulte: docs/DOCKER_REMOTE_MAC_WINDOWS.md${NC}"
+
 # Função para testar conexão
 test_connection() {
     local ip=$1
