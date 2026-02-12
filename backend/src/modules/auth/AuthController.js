@@ -4,6 +4,7 @@ const config = require('../../config/env');
 const db = require('../../db/models');
 const { responseSuccess, responseError } = require('../../core/utils/response');
 const { AppError } = require('../../core/errors/AppError');
+const tokenBlacklist = require('../../../services/tokenBlacklist');
 
 class AuthController {
   constructor() {
@@ -115,8 +116,8 @@ class AuthController {
     try {
       const authHeader = req.headers.authorization;
       if (authHeader && authHeader.startsWith('Bearer ')) {
-        // Em produção, poderíamos adicionar o token a uma blacklist
-        // Para MVP, apenas respondemos sucesso
+        const accessToken = authHeader.split(' ')[1];
+        await tokenBlacklist.add(accessToken);
       }
 
       // Se tiver refresh token no body, revogá-lo

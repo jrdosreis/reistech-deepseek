@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../../config/env');
 const { AppError } = require('../errors/AppError');
 const db = require('../../db/models');
+const tokenBlacklist = require('../../../services/tokenBlacklist');
 
 function getCookieValue(cookieHeader, name) {
   if (!cookieHeader) return null;
@@ -36,6 +37,12 @@ async function authenticate(req, res, next) {
     if (!token) {
       throw new AppError('Token não fornecido', 'TOKEN_MISSING', 401);
     }
+
+    // Verificar blacklist (tokens revogados via logout)
+    if (await tokenBlacklist.isBlacklisted(token)) {
+      throw new AppError('Token revogado', 'TOKEN_REVOKED', 401);
+    }
+
     const decoded = jwt.verify(token, config.jwt.secret);
 
     // Buscar usuário
