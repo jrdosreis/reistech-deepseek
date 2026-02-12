@@ -1,16 +1,19 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useSnackbar } from 'notistack';
 import { Button } from '@mui/material';
+import { setConnected, addNewMessage, addFilaUpdate } from '../../store/websocketSlice';
+import { addNotification, markAsRead, clearNotifications } from '../../store/notificationsSlice';
 
 export function useWebSocket() {
   const wsRef = useRef(null);
-  const [isConnected, setIsConnected] = useState(false);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
   const { isAuthenticated, user } = useSelector(state => state.auth);
   const { currentWorkspace } = useSelector(state => state.ui);
+  const isConnected = useSelector(state => state.websocket.isConnected);
   const { enqueueSnackbar } = useSnackbar();
   const reconnectTimeoutRef = useRef(null);
+  const dispatch = useDispatch();
 
   const connect = useCallback(() => {
     if (!isAuthenticated || !currentWorkspace || wsRef.current?.readyState === WebSocket.OPEN) {
@@ -26,7 +29,7 @@ export function useWebSocket() {
       wsRef.current = ws;
 
       ws.onopen = () => {
-        setIsConnected(true);
+        dispatch(setConnected(true));
         setReconnectAttempts(0);
         console.log('WebSocket conectado');
 
@@ -37,7 +40,7 @@ export function useWebSocket() {
       };
 
       ws.onclose = (event) => {
-        setIsConnected(false);
+        dispatch(setConnected(false));
         console.log('WebSocket desconectado:', event.code, event.reason);
 
         if (reconnectAttempts < 5) {
@@ -77,7 +80,7 @@ export function useWebSocket() {
     if (wsRef.current) {
       wsRef.current.close();
       wsRef.current = null;
-      setIsConnected(false);
+      dispatch(setConnected(false));
     }
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
@@ -141,10 +144,7 @@ export function useWebSocket() {
 
   const handleNewMessage = useCallback((data) => {
     const { clienteId, message } = data;
-    const event = new CustomEvent('new_whatsapp_message', {
-      detail: { clienteId, message }
-    });
-    window.dispatchEvent(event);
+    dispatch(addNewMessage({ clienteId, message }));
 
     if (!window.location.pathname.includes('/conversas')) {
       enqueueSnackbar(`Nova mensagem de ${message.clienteNome || 'cliente'}`, {
@@ -164,10 +164,7 @@ export function useWebSocket() {
 
   const handleFilaUpdate = useCallback((data) => {
     const { action, filaItem } = data;
-    const event = new CustomEvent('fila_updated', {
-      detail: { action, filaItem }
-    });
-    window.dispatchEvent(event);
+    dispatch(addFilaUpdate({ action, filaItem }));
 
     if (user && filaItem.operador_id === user.id) {
       enqueueSnackbar(
@@ -180,19 +177,14 @@ export function useWebSocket() {
   }, [user, enqueueSnackbar]);
 
   const handleClienteEstadoUpdate = useCallback((data) => {
+    // Estado do cliente atualizado - pode ser consumido via store se necessário
     const { clienteId, estado } = data;
-    const event = new CustomEvent('cliente_estado_changed', {
-      detail: { clienteId, estado }
-    });
-    window.dispatchEvent(event);
+    dispatch(addNewMessage({ type: 'cliente_estado_update', clienteId, estado }));
   }, []);
 
   const handleNewNotification = useCallback((data) => {
     const { notification } = data;
-    const event = new CustomEvent('new_notification_received', {
-      detail: { notification }
-    });
-    window.dispatchEvent(event);
+    dispatch(addNotification(notification));
 
     if (notification?.title) {
       enqueueSnackbar(notification.title, {
@@ -235,40 +227,19 @@ export function useWebSocket() {
 }
 
 export function useRealtimeNotifications() {
-  const [notifications, setNotifications] = useState([]);
-
-  useEffect(() => {
-    const handler = (event) => {
-      const notification = event.detail?.notification;
-      if (!notification) {
-        return;
-      }
-
-      const normalized = {
-        id: notification.id || `notification_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
-        read: false,
-        createdAt: notification.createdAt || new Date().toISOString(),
-        ...notification,
-      };
-
-      setNotifications(prev => [normalized, ...prev].slice(0, 100));
-    };
-
-    window.addEventListener('new_notification_received', handler);
-    return () => window.removeEventListener('new_notification_received', handler);
-  }, []);
+  const dispatch = useDispatch();
+  const notifications = useSelector(state => state.notifications.items);
+  const notificacoesNaoLidas = useSelector(state =>
+    state.notifications.items.filter(n => !n.read)
+  );
 
   const marcarComoLida = useCallback((notificationId) => {
-    setNotifications(prev => prev.map(notif => (
-      notif.id === notificationId ? { ...notif, read: true, readAt: new Date().toISOString() } : notif
-    )));
-  }, []);
+    dispatch(markAsRead(notificationId));
+  }, [dispatch]);
 
   const limparNotificacoes = useCallback(() => {
-    setNotifications([]);
-  }, []);
-
-  const notificacoesNaoLidas = notifications.filter(notif => !notif.read);
+    dispatch(clearNotifications());
+  }, [dispatch]);
 
   return {
     notifications,
