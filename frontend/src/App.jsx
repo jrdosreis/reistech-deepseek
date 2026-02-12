@@ -12,6 +12,7 @@ const Catalogo = lazy(() => import('./pages/Catalogo'))
 const TextosCms = lazy(() => import('./pages/TextosCms'))
 const WhatsApp = lazy(() => import('./pages/WhatsApp'))
 const Configuracao = lazy(() => import('./pages/Configuracao'))
+const Relatorios = lazy(() => import('./pages/Relatorios'))
 
 // Components (carregamento normal – críticos para layout)
 import Layout from './components/layout/Layout'
@@ -55,12 +56,14 @@ function App() {
             </PrivateRoute>
           }
         >
-          <Route index element={<Navigate to="fila" />} />
+          <Route index element={<Navigate to="dashboard" />} />
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="fila" element={<FilaHumana />} />
           <Route path="conversas" element={<Conversas />} />
           <Route path="catalogo" element={<Catalogo />} />
           <Route path="textos" element={<TextosCms />} />
           <Route path="whatsapp" element={<WhatsApp />} />
+          <Route path="relatorios" element={<Relatorios />} />
           <Route path="configuracao" element={<Configuracao />} />
         </Route>
         
