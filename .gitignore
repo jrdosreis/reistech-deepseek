@@ -48,6 +48,11 @@ coverage/
 *.swo
 *~
 
+# Continue AI Extension (proteger chaves de API)
+.continue/config.json
+!.continue/config.json.template
+!.continue/README.md
+
 # OS
 .DS_Store
 Thumbs.db

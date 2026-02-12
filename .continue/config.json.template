@@ -1,0 +1,59 @@
+{
+  "models": [
+    {
+      "title": "DeepSeek Chat",
+      "provider": "openai",
+      "model": "deepseek-chat",
+      "apiBase": "https://api.deepseek.com/v1",
+      "apiKey": "COLE_SUA_CHAVE_AQUI"
+    }
+  ],
+  "customCommands": [
+    {
+      "name": "review",
+      "description": "Revisar código e apontar melhorias",
+      "prompt": "Revise este código seguindo as melhores práticas do projeto ReisTech:\n- Verifique segurança (injection, auth, validação)\n- Busque bugs ou race conditions\n- Avalie performance e escalabilidade\n- Sugira refatorações\n\nCódigo:\n{{{ input }}}"
+    },
+    {
+      "name": "explain",
+      "description": "Explicar código em português",
+      "prompt": "Explique este código de forma clara e didática em português:\n\n{{{ input }}}\n\nIncluindo:\n1. O que o código faz\n2. Como funciona (passo a passo)\n3. Conceitos chave utilizados\n4. Possíveis casos de uso"
+    },
+    {
+      "name": "test",
+      "description": "Gerar testes unitários com Jest",
+      "prompt": "Gere testes unitários completos usando Jest para este código:\n\n{{{ input }}}\n\nSiga o padrão do projeto:\n- Use mocks para dependências externas\n- Teste casos de sucesso e erro\n- Use describe/it em português\n- Inclua comentários explicativos"
+    },
+    {
+      "name": "fix",
+      "description": "Corrigir bug ou erro",
+      "prompt": "Analise e corrija este código:\n\n{{{ input }}}\n\nIdentifique:\n- Bugs evidentes\n- Problemas de lógica\n- Edge cases não tratados\n- Melhorias de segurança\n\nRetorne o código corrigido com explicação."
+    }
+  ],
+  "slashCommands": [
+    {
+      "name": "docs",
+      "description": "Consultar documentação do projeto",
+      "prompt": "Consulte a documentação em /docs e responda: {{{ input }}}"
+    }
+  ],
+  "contextProviders": [
+    {
+      "name": "diff",
+      "params": {}
+    },
+    {
+      "name": "folder",
+      "params": {}
+    },
+    {
+      "name": "code",
+      "params": {}
+    }
+  ],
+  "allowAnonymousTelemetry": false,
+  "docs": [
+    "https://github.com/jrdosreis/reistech-deepseek/blob/main/README.md",
+    "https://github.com/jrdosreis/reistech-deepseek/tree/main/docs"
+  ]
+}
