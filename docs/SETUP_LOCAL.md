@@ -431,7 +431,7 @@ npm run seed
 - ✅ Importar catálogo CSV
 - ✅ Personalizar textos do bot (CMS)
 - ✅ Testar fila humana
-- 📖 Ler [MANUAL-OFICIAL.html](../MANUAL-OFICIAL.html) para setup remoto
+- 📖 Ler [MANUAL-OFICIAL.html](manuals/MANUAL-OFICIAL.html) para setup remoto
 
 ---
 
@@ -439,7 +439,7 @@ npm run seed
 
 - [README Principal](../README.md)
 - [Estrutura do Projeto](ESTRUTURA.md)
-- [Manual Oficial](../MANUAL-OFICIAL.html)
+- [Manual Oficial](manuals/MANUAL-OFICIAL.html)
 - [Guia de Migração](MIGRATION_GUIDE.md)
 - [Otimização para Produção](OTIMIZACAO_PRODUCAO.md)
 

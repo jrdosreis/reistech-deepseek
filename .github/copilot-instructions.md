@@ -6,7 +6,7 @@
 - **Key concept**: FSM-driven WhatsApp automation with multi-tenant workspace isolation and hot-reloadable business rules
 
 ## Setup documentation
-- **Official manual**: See `MANUAL-OFICIAL.html` for complete Docker + remote development setup (Windows Docker host + MacBook development)
+- **Official manual**: See `docs/manuals/MANUAL-OFICIAL.html` for complete Docker + remote development setup (Windows Docker host + MacBook development)
 - **Local setup guide**: `docs/SETUP_LOCAL.md` for non-Docker development
 - **Environment**: Windows at 192.168.100.232 (Docker host), MacBook (development station)
 - **Credentials**: All `.env` files with validated credentials documented in manual (DB, SMTP, JWT, admin access)

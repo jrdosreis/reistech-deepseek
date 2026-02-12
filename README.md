@@ -351,7 +351,6 @@ docker-compose up -d --build
 ```
 .
 ├── .env                        # Variáveis de ambiente (Docker Compose)
-├── MANUAL-OFICIAL.html         # Manual completo de setup
 ├── README.md                   # Este arquivo
 ├── docker-compose.yml          # Desenvolvimento
 ├── docker-compose.prod.yml     # Produção
@@ -370,11 +369,11 @@ docker-compose up -d --build
 │   ├── ecosystem.config.js     # PM2 cluster config
 │   │
 │   ├── src/
-│   │   ├── config/            # Database, env, logger, theme
+│   │   ├── config/            # Database, env, logger
 │   │   ├── core/
 │   │   │   ├── engine/        # FSM (ReisTech, StateMachine, Router, DossierBuilder)
 │   │   │   ├── errors/        # AppError, errorHandler
-│   │   │   ├── middleware/    # Auth, validation
+│   │   │   ├── middleware/    # Auth, validation, audit
 │   │   │   └── utils/         # Helpers
 │   │   ├── db/
 │   │   │   ├── migrations/    # 11 migrations
@@ -396,9 +395,7 @@ docker-compose up -d --build
 │   │   └── workspaces/
 │   │       └── packs/         # JSON files (iphone_store, law_firm, motorcycle_shop)
 │   │
-│   ├── services/              # Cache, logger, health check
-│   ├── middleware/            # Security, rate limiter
-│   ├── scripts/               # Backup scripts
+│   ├── services/              # Cache Redis, token blacklist
 │   ├── tests/
 │   │   ├── unit/              # Testes unitários (Jest)
 │   │   └── integration/       # Testes de integração
@@ -453,7 +450,8 @@ docker-compose up -d --build
 │   │   ├── STATUS_FINAL.md
 │   │   └── NEXTEPS_STATUS.md
 │   │
-│   └── manuals/               # Manuais arquivados
+│   └── manuals/               # Manuais
+│       ├── MANUAL-OFICIAL.html
 │       └── manual-reistech-legacy.html
 │
 ├── scripts/
@@ -490,7 +488,7 @@ Este projeto é proprietário. Copyright © 2024-2026 ReisTech. Todos os direito
 
 ## 🔗 Links Úteis
 
-- [Manual Oficial](MANUAL-OFICIAL.html) – Setup Windows + MacBook
+- [Manual Oficial](docs/manuals/MANUAL-OFICIAL.html) – Setup Windows + MacBook
 - [API Documentation](docs/api_endpoints_documentacao.yaml)
 - [Database Schema](docs/estrutura_banco_dados.sql)
 - [Architecture Diagram](docs/diagrama_arquitetura_sistema.txt)

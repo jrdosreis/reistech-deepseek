@@ -22,11 +22,9 @@ reistech-deepseek/
 │   ├── estrutura_banco_dados.sql
 │   └── ...
 ├── scripts/                    # Scripts de automação e deploy
-├── postgres/                   # Inicialização PostgreSQL
 ├── .env                        # Credenciais Docker Compose (não commitado)
 ├── docker-compose.yml          # Desenvolvimento
 ├── docker-compose.prod.yml     # Produção
-├── MANUAL-OFICIAL.html         # Manual de setup definitivo
 └── README.md                   # Documentação principal do projeto
 ```
 
@@ -67,6 +65,8 @@ reistech-deepseek/
 
 ### Mantidos na raiz (principais)
 - `README.md` - Documentação principal
+
+### Mantidos em `docs/manuals/`
 - `MANUAL-OFICIAL.html` - Setup completo do ambiente
 
 ### Movidos para `docs/github/`

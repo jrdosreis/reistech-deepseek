@@ -14,7 +14,6 @@ Este documento descreve a organização completa de pastas e arquivos do projeto
 reistech-deepseek/
 ├── .env                        # Variáveis de ambiente (Docker Compose)
 ├── .gitignore                  # Arquivos ignorados pelo Git
-├── MANUAL-OFICIAL.html         # Manual completo de setup (Windows + MacBook)
 ├── README.md                   # Documentação principal do projeto
 ├── docker-compose.yml          # Orquestração de containers (desenvolvimento)
 ├── docker-compose.prod.yml     # Orquestração de containers (produção)
@@ -385,7 +384,7 @@ Configurações do Visual Studio Code.
 ### Outros
 
 - **`.gitignore`**: Arquivos ignorados pelo Git
-- **`MANUAL-OFICIAL.html`**: Manual completo de setup Windows + MacBook
+- **`docs/manuals/MANUAL-OFICIAL.html`**: Manual completo de setup Windows + MacBook
 - **`LICENSE`**: Licença do projeto (proprietário)
 
 ## 📊 Estatísticas do Projeto
