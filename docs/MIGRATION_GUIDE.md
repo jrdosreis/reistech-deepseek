@@ -30,7 +30,7 @@ cat ~/backups/reistech/$(ls -t ~/backups/reistech/ | head -1)/backup_report.md
 ./scripts/limpar-macbook.sh
 
 # 2. Verificar portas liberadas
-lsof -i :3000,3001,5432,80,6379,5173
+lsof -i :3000,5432,80,6379,5173
 ```
 
 #### 1.3 Organização do Projeto
@@ -77,9 +77,9 @@ Disk image size: 64GB
 New-NetFirewallRule -DisplayName "Docker Daemon" `
   -Direction Inbound -Protocol TCP -LocalPort 2375 -Action Allow
 
-# Permitir porta 3001 (Backend)
+# Permitir porta 3000 (Backend)
 New-NetFirewallRule -DisplayName "Reistech Backend" `
-  -Direction Inbound -Protocol TCP -LocalPort 3001 -Action Allow
+  -Direction Inbound -Protocol TCP -LocalPort 3000 -Action Allow
 
 # Permitir porta 5173 (Frontend)
 New-NetFirewallRule -DisplayName "Reistech Frontend" `
@@ -210,10 +210,10 @@ curl http://IP_WINDOWS:5173
 
 **Backend API:**
 ```bash
-curl http://IP_WINDOWS:3001/health
+curl http://IP_WINDOWS:3000/health
 # Deve retornar: {"status":"ok","timestamp":"..."}
 
-curl http://IP_WINDOWS:3001/api/workspaces
+curl http://IP_WINDOWS:3000/api/workspaces
 # Deve retornar lista de workspaces
 ```
 
@@ -268,13 +268,13 @@ Get-NetFirewallRule -DisplayName "*Docker*"
 
 **Sintomas:**
 ```
-Error starting userland proxy: listen tcp 0.0.0.0:3001: bind: address already in use
+Error starting userland proxy: listen tcp 0.0.0.0:3000: bind: address already in use
 ```
 
 **Soluções:**
 ```bash
 # No Windows, verificar portas em uso:
-netstat -ano | findstr :3001
+netstat -ano | findstr :3000
 
 # Matar processo (substituir <PID>):
 taskkill /PID <PID> /F
@@ -451,7 +451,7 @@ dlog-redis       # Logs do Redis
 
 # Filtrar logs
 dlog-backend | grep ERROR
-dlog-backend | grep -i "port 3001"
+dlog-backend | grep -i "port 3000"
 
 # Logs em tempo real com timestamps
 docker-compose logs -f -t backend
@@ -526,7 +526,7 @@ docker-compose exec backend nslookup postgres
 - [ ] ✅ Seeds executados (`npm run seed`)
 - [ ] ✅ Todos os serviços rodando (verificar com `dhealth`)
 - [ ] ✅ Frontend acessível em `http://IP_WINDOWS:5173`
-- [ ] ✅ Backend respondendo em `http://IP_WINDOWS:3001/health`
+- [ ] ✅ Backend respondendo em `http://IP_WINDOWS:3000/health`
 - [ ] ✅ Banco de dados acessível via psql/PGAdmin
 - [ ] ✅ Hot reload funcionando em frontend/backend
 - [ ] ✅ Debug configurado no VS Code
@@ -691,7 +691,7 @@ docker-where
 #### Problema: "Port already in use"
 ```bash
 # No Windows:
-netstat -ano | findstr :3001
+netstat -ano | findstr :3000
 taskkill /PID <PID> /F
 
 # No MacBook:

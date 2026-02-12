@@ -620,7 +620,7 @@ sudo nano /etc/redis/redis.conf
 
 
 # Limpar rate limits de um IP específico
-curl -X POST http://localhost:3001/api/admin/rate-limit/clear \
+curl -X POST http://localhost:3000/api/admin/rate-limit/clear \
   -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"ip": "192.168.1.100"}'
@@ -642,7 +642,7 @@ redis-cli --scan --pattern 'ratelimit:*:192.168.1.100' | xargs redis-cli del
 redis-cli --scan --pattern 'reistech:*:workspace:123:*' | xargs redis-cli del
 
 # Ou invalidar cache específico via API
-curl -X POST http://localhost:3001/api/admin/cache/invalidate \
+curl -X POST http://localhost:3000/api/admin/cache/invalidate \
   -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"workspace_id": 123}'
@@ -684,7 +684,7 @@ pm2 save
 
 
 # Verificar portas em uso
-sudo netstat -tlnp | grep :3001
+sudo netstat -tlnp | grep :3000
 
 # Monitorar recursos
 htop

@@ -21,7 +21,7 @@ cd backend && cp .env.example .env
 npm install
 npm run migrate up
 npm run seed
-npm run dev  # Runs on :3001
+npm run dev  # Runs on :3000
 
 # Frontend (new terminal)
 cd frontend && npm install
@@ -41,8 +41,8 @@ docker-compose exec backend npm run seed
 - **Reset DB**: `npm run db:reset` (down → up → seed)
 
 ### Default URLs & credentials
-- **Local dev**: Frontend http://localhost:5173, Backend http://localhost:3001/api, WebSocket ws://localhost:3001/ws
-- **Remote (Windows Docker)**: Frontend http://192.168.100.232, Backend http://192.168.100.232:3000/api
+- **Local dev**: Frontend http://localhost:5173, Backend http://localhost:3000/api, WebSocket ws://localhost:3000/ws
+- **Remote (Windows Docker)**: Frontend http://192.168.100.232, Backend http://192.168.100.232:3000/api, WebSocket ws://192.168.100.232:3000/ws
 - **Default login**: contato@reiscelulares.com.br / admin@reiscelulares
 - **SMTP**: Hostinger (smtp.hostinger.com:465) - credentials in `.env`
 

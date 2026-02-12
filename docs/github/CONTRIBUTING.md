@@ -174,8 +174,8 @@ npm run dev
 
 **URLs:**
 - Frontend: http://localhost:5173
-- Backend: http://localhost:3001
-- WebSocket: ws://localhost:3001/ws
+- Backend: http://localhost:3000
+- WebSocket: ws://localhost:3000/ws
 
 **Credenciais padrão:**
 - Email: admin@reiscelulares.com.br
