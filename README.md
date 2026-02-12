@@ -1,4 +1,4 @@
-# ReisTech DeepSeek
+# Reistech DeepSeek
 
 [![CI/CD Pipeline](https://github.com/jrdosreis/reistech-deepseek/actions/workflows/ci-cd.yml/badge.svg?branch=main)](https://github.com/jrdosreis/reistech-deepseek/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -8,15 +8,22 @@
 
 Sistema completo de atendimento automatizado via WhatsApp com motor FSM determinístico, suporte multi-nicho e painel administrativo em React.
 
-## Visão geral
+---
 
-O ReisTech DeepSeek centraliza conversas, integrações e workflows de atendimento usando um motor FSM (finite state machine) determinístico, permitindo escalar atendimento automático e humano com rastreabilidade, auditoria e personalização por nicho.
+## 📋 Visão geral
 
-## Documentação e utilitários
-- Documentação em [docs/](docs/) (guia de migração, resumo de organização, otimizações, especificação técnica, diagrama de arquitetura, endpoints, esquema SQL, fluxos de nichos).
-- Scripts em [scripts/](scripts/) (limpeza, backup, testes, verificação, deploy, PREPARE_FOR_WINDOWS).
+O Reistech DeepSeek centraliza conversas, integrações e workflows de atendimento usando um motor FSM (finite state machine) determinístico, permitindo escalar atendimento automático e humano com rastreabilidade, auditoria e personalização por nicho.
 
-## Atualizações e Melhorias Técnicas (v1.1)
+---
+
+## 📚 Documentação e utilitários
+
+- **Documentação técnica**: [`docs/`](docs/) — guia de migração, resumo de organização, otimizações, especificação técnica, diagrama de arquitetura, endpoints, esquema SQL, fluxos de nichos.
+- **Scripts utilitários**: [`scripts/`](scripts/) — limpeza, backup, testes, verificação, deploy, `PREPARE_FOR_WINDOWS`.
+
+---
+
+## 🆕 Atualizações e Melhorias Técnicas (v1.1)
 
 O projeto recebeu atualizações estruturais focadas em segurança, performance e manutenibilidade:
 
@@ -35,7 +42,9 @@ O projeto recebeu atualizações estruturais focadas em segurança, performance 
 - **Suíte de Testes**: Adição de testes unitários (Jest) para o `DossierBuilder` e testes de integração (Supertest) para a API.
 - **Seeds Resilientes**: Scripts de população de banco ajustados para funcionar corretamente em qualquer ambiente ou workspace.
 
-## Principais recursos
+---
+
+## 💡 Principais recursos
 
 ### Backend
 - Motor FSM determinístico com fluxos previsíveis.
@@ -47,7 +56,7 @@ O projeto recebeu atualizações estruturais focadas em segurança, performance 
 - CMS de textos (no-code) para mensagens do bot.
 - Autenticação JWT + Refresh Token e RBAC.
 - Logs e auditoria estruturados.
-- API REST sob /api.
+- API REST sob `/api`.
 - **Novo:** Endpoint para recarga de regras em tempo real (`/reload-rules`).
 
 ### Frontend
@@ -58,23 +67,29 @@ O projeto recebeu atualizações estruturais focadas em segurança, performance 
 - Gestão de workspace e packs.
 
 ### Multi-nicho
-- Packs incluídos: iphone_store, law_firm, motorcycle_shop.
+- Packs incluídos: `iphone_store`, `law_firm`, `motorcycle_shop`.
 - Criação e customização de novos workspaces.
 
-## Arquitetura
+---
 
-- Backend: Node.js + Express
-- Frontend: React + Vite + Material UI
-- Banco: PostgreSQL
-- WebSocket: atualizações em tempo real
-- Redis: opcional (sessão/rate limiting)
+## 🏗️ Arquitetura
 
-## Requisitos
+- **Backend**: Node.js + Express
+- **Frontend**: React + Vite + Material UI
+- **Banco**: PostgreSQL
+- **WebSocket**: atualizações em tempo real
+- **Redis**: opcional (sessão/rate limiting)
+
+---
+
+## ⚙️ Requisitos
 
 - Node.js 18+
 - PostgreSQL 15+
-- Redis (opcional)
+- Redis 7+ (opcional, recomendado)
 - Docker e Docker Compose (opcional)
+
+---
 
 ## 🧪 Testes Automatizados
 
@@ -100,6 +115,8 @@ npm test
 # Testes E2E (Cypress)
 npm run test:e2e
 ```
+
+---
 
 ## 📊 Banco de Dados
 
@@ -130,6 +147,8 @@ npm run seed
 npm run db:reset
 ```
 
+---
+
 ## 🛠️ Scripts Úteis
 
 ```bash
@@ -149,23 +168,9 @@ npm run db:reset
 ./scripts/auditoria-macbook.sh
 ```
 
-## 📋 Documentação Completa
-
-- **[Setup Local](docs/SETUP_LOCAL.md)** - Guia detalhado para ambiente de desenvolvimento
-- **[Manual Oficial](MANUAL-OFICIAL.html)** - Setup completo Windows + MacBook (desenvolvimento remoto)
-- **[Estrutura do Projeto](docs/ESTRUTURA.md)** - Organização de pastas e arquivos
-- **[Guia de Migração](docs/MIGRATION_GUIDE.md)** - Atualizações e migrações de versão
-- **[Otimização para Produção](docs/OTIMIZACAO_PRODUCAO.md)** - Deploy e configurações de produção
-- **[Especificação Técnica](docs/reistech_especificacao_tecnica.md)** - Detalhes técnicos completos
+---
 
 ## 🚀 Quick Start
-
-### Requisitos
-
-- Node.js 18+
-- PostgreSQL 15+
-- Redis 7+ (opcional, mas recomendado)
-- Docker e Docker Compose (opcional)
 
 ### Setup Local (macOS)
 
@@ -226,6 +231,8 @@ docker-compose -f docker-compose.prod.yml up -d
 docker-compose -f docker-compose.prod.yml exec backend npm run migrate up
 ```
 
+---
+
 ## 🌐 URLs e Credenciais
 
 ### Desenvolvimento Local
@@ -233,49 +240,108 @@ docker-compose -f docker-compose.prod.yml exec backend npm run migrate up
 - **Backend API**: http://localhost:3000/api
 - **WebSocket**: ws://localhost:3000/ws
 
-### Desenvolvimento Docker (Remoto)
+### Desenvolvimento Docker (Remoto com Windows)
 - **Frontend**: http://192.168.100.232 (porta 80)
 - **Backend API**: http://192.168.100.232:3000/api
 - **WebSocket**: ws://192.168.100.232:3000/ws
 
 ### Credenciais Padrão
-- **Email**: contato@reiscelulares.com.br
-- **Senha**: admin@reiscelulares
+- **Email**: `contato@reiscelulares.com.br`
+- **Senha**: `admin@reiscelulares`
 
-## Principais endpoints
+---
 
-### Autenticação
-- POST /api/auth/login - Login de usuário
-- POST /api/auth/logout - Logout
-- POST /api/auth/refresh - Refresh token
+## 🩺 Health Check
 
-### WhatsApp
-- GET /api/whatsapp/status - Status da conexão
-- GET /api/whatsapp/qr - QR Code para conectar
-- POST /api/whatsapp/disconnect - Desconectar sessão
+O sistema expõe endpoints de health check para monitoramento de disponibilidade e diagnóstico.
 
-### Fila Humana
-- GET /api/fila - Listar clientes na fila
-- POST /api/fila/:telefone/assumir - Assumir atendimento
-- POST /api/fila/:telefone/finalizar - Finalizar atendimento
+| Endpoint | Descrição | Formato Resposta |
+|----------|----------|------------------|
+| `GET /health` | Status geral da aplicação | `{"status":"ok","timestamp":"..."}` |
+| `GET /health/db` | Verifica conexão com PostgreSQL | `{"status":"ok","database":"connected"}` |
+| `GET /health/redis` | Verifica conexão com Redis (se habilitado) | `{"status":"ok","redis":"connected"}` |
+| `GET /health/whatsapp` | Status da sessão WhatsApp | `{"status":"ok","whatsapp":"connected","qr":null}` |
 
-### Catálogo
-- GET /api/catalogo - Listar produtos
-- POST /api/catalogo/import - Importar CSV
-- PUT /api/catalogo/:id - Atualizar produto
-- DELETE /api/catalogo/:id - Deletar produto
+**Exemplo de uso:**
+```bash
+curl http://localhost:3000/health
+```
 
-### CMS Textos
-- GET /api/cms/textos - Listar textos configuráveis
-- PUT /api/cms/textos/:chave - Atualizar texto
+**Integração com Docker:**  
+Os containers já possuem `HEALTHCHECK` definido. Utilize `docker ps` para ver o estado de saúde.
 
-### Workspaces
-- GET /api/workspaces - Listar workspaces
-- GET /api/workspaces/packs - Listar packs disponíveis
-- POST /api/workspaces - Criar workspace
-- PUT /api/workspaces/:id - Atualizar workspace
-- DELETE /api/workspaces/:id - Deletar workspace
-- POST /api/workspaces/:workspaceId/reload-rules - Recarregar regras FSM
+---
+
+## ⚠️ Troubleshooting Rápido
+
+### 🔴 **Problema: Containers não sobem ou caem logo após iniciar**
+```bash
+# Verificar logs detalhados
+docker-compose logs --tail=50
+
+# Verificar conflito de portas
+netstat -ano | findstr :3000   # Windows
+lsof -i :3000                  # macOS/Linux
+
+# Solução: Mude a porta no .env ou pare o processo conflitante
+```
+
+### 🔴 **Problema: Porta 5432 (PostgreSQL) já está em uso**
+```bash
+# Identificar processo
+lsof -i :5432
+
+# Parar PostgreSQL local (se não for mais necessário)
+brew services stop postgresql@14
+sudo systemctl stop postgresql  # Linux
+```
+
+### 🔴 **Problema: MacBook não consegue conectar ao Docker do Windows**
+```bash
+# 1. Verificar se o IP está correto
+ping 192.168.100.232
+
+# 2. Testar a porta 2375
+telnet 192.168.100.232 2375
+
+# 3. Verificar se o Docker Desktop no Windows:
+#    - Está rodando
+#    - Tem a opção "Expose daemon on tcp://localhost:2375" ativada
+#    - O firewall permite a porta 2375
+```
+
+### 🔴 **Problema: Banco de dados não inicializa no primeiro `docker-compose up`**
+```bash
+# Remover volumes antigos e reconstruir
+docker-compose down -v
+docker-compose up -d --build
+```
+
+### 🔴 **Problema: Hot‑reload não funciona no backend**
+- Verifique se o volume `./backend:/usr/src/app` está corretamente montado no `docker-compose.yml`.
+- Confirme que o comando é `npm run dev` (com nodemon ou ts-node-dev).
+
+---
+
+## 🛡️ Nota de Segurança (Evite Erros Críticos)
+
+1. **NUNCA commite arquivos `.env` no repositório.**  
+   Eles contêm senhas, chaves JWT e credenciais SMTP.  
+   ✅ Utilize `.env.example` para documentação.
+
+2. **Em produção, SEMPRE gere novas chaves JWT e senhas de banco.**  
+   ❌ Nunca reutilize as credenciais de desenvolvimento.
+
+3. **A porta 2375 (Docker remoto) NÃO deve estar exposta na internet.**  
+   Em rede doméstica, o risco é baixo, mas isole a máquina Windows com firewall.
+
+4. **Execute containers com usuário não‑root sempre que possível.**  
+   Os Dockerfiles de produção já implementam esta prática.
+
+5. **Backup automático:**  
+   Configure o script `scripts/backup-projeto.sh` em uma tarefa agendada (cron/Task Scheduler).
+
+---
 
 ## 📁 Estrutura do Projeto
 
@@ -421,7 +487,9 @@ Este projeto é proprietário. Copyright © 2024-2026 ReisTech. Todos os direito
 
 ## 🔗 Links Úteis
 
-- [Manual Oficial](MANUAL-OFICIAL.html) - Setup Windows + MacBook
+- [Manual Oficial](MANUAL-OFICIAL.html) – Setup Windows + MacBook
 - [API Documentation](docs/api_endpoints_documentacao.yaml)
 - [Database Schema](docs/estrutura_banco_dados.sql)
 - [Architecture Diagram](docs/diagrama_arquitetura_sistema.txt)
+
+---
