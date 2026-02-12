@@ -19,6 +19,7 @@ O Reistech DeepSeek centraliza conversas, integrações e workflows de atendimen
 ## 📚 Documentação e utilitários
 
 - **Documentação técnica**: [`docs/`](docs/) — guia de migração, resumo de organização, otimizações, especificação técnica, diagrama de arquitetura, endpoints, esquema SQL, fluxos de nichos.
+- **Diagrama de Arquitetura (Mermaid)**: [`docs/diagrama_arquitetura_sistema.md`](docs/diagrama_arquitetura_sistema.md) — visão geral, fluxo FSM e deploy renderizados como diagramas Mermaid.
 - **Scripts utilitários**: [`scripts/`](scripts/) — limpeza, backup, testes, verificação, deploy, `PREPARE_FOR_WINDOWS`.
 - **CI/CD Troubleshooting**: [`docs/CI_CD_TROUBLESHOOTING.md`](docs/CI_CD_TROUBLESHOOTING.md) — Guia completo para resolver problemas no GitHub Actions.
 - **Docker Remoto (Mac → Windows)**: [`docs/DOCKER_REMOTE_MAC_WINDOWS.md`](docs/DOCKER_REMOTE_MAC_WINDOWS.md) — Configuração completa para usar Docker do Windows a partir do Mac.
